@@ -16,11 +16,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  student_id: string;
-  plate?: string;
 }
 
-export default function UserTable() {
+export default function ParkingAttendant() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,32 +28,16 @@ export default function UserTable() {
     async function fetchData() {
       setLoading(true);
       try {
-        const userSnapshot = await getDocs(collection(db, "users"));
+        const userSnapshot = await getDocs(collection(db, "parking_attendants"));
         console.log(`USER ${userSnapshot}}`);
         const usersData = userSnapshot.docs.map((doc) => ({
           id: doc.id,
           name: doc.data().name,
           email: doc.data().email,
-          student_id: doc.data().student_id,
         }));
 
-        const vehicleSnapshot = await getDocs(collection(db, "vehicles"));
-        const vehiclesData = vehicleSnapshot.docs.map((doc) => ({
-          user_id: doc.data().user_id,
-          plate: doc.data().plate,
-        }));
 
-        const merged = usersData.map((user) => {
-          const matchedVehicle = vehiclesData.find(
-            (v) => v.user_id === user.id
-          );
-          return {
-            ...user,
-            plate: matchedVehicle?.plate || "-",
-          };
-        });
-
-        setUsers(merged);
+        setUsers(usersData);
       } catch (error) {
         console.error("Error fetching users and vehicles:", error);
       }
@@ -128,18 +110,6 @@ export default function UserTable() {
                 isHeader
                 className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
               >
-                NIM
-              </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Plat Nomor
-              </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
                 Action
               </TableCell>
             </TableRow>
@@ -157,12 +127,6 @@ export default function UserTable() {
                 </TableCell>
                 <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
                   {user.email}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {user.student_id}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {user.plate}
                 </TableCell>
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">

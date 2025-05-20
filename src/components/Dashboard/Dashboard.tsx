@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { collection, getDocs, query } from "firebase/firestore";
-import { User } from "../tables/UserTables/UserTable";
+import { User } from "../tables/StudentTables/StudentTable";
 import { db } from "../../configuration";
 import { convertToAge } from "../../utils/DateUtil";
 import dayjs from "dayjs";
@@ -11,9 +11,7 @@ import EcommerceMetrics from "../ecommerce/EcommerceMetrics";
 export default function Dashboard() {
   const [patients, setPatients] = useState<User[]>([]);
   const [selectedRange, setSelectedRange] = useState<string>("1_month");
-  const [activityData, setActivityData] = useState<
-    { date: string; count: number }[]
-  >([]);
+  const [activityData, setActivityData] = useState<{ date: string; count: number }[]>([]);
 
   useEffect(() => {
     async function fetchPatients() {
@@ -112,10 +110,7 @@ export default function Dashboard() {
     const filteredPatients = patients.filter((p) => {
       if (!p.createdAt) return false;
       const createdAtDate = p.createdAt;
-      return (
-        dayjs(createdAtDate).isAfter(startDate) &&
-        dayjs(createdAtDate).isBefore(today.add(1, "day"))
-      );
+      return dayjs(createdAtDate).isAfter(startDate) && dayjs(createdAtDate).isBefore(today.add(1, "day"));
     });
 
     const dateRange = generateDateRange(startDate, today);
@@ -254,14 +249,8 @@ export default function Dashboard() {
       {/* Aktivitas Chart */}
       <div className="py-5 rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="flex justify-between items-center mx-5 mb-4">
-          <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold">
-            Aktivitas Pengguna
-          </h2>
-          <select
-            className="border border-gray-300 dark:bg-gray-800 p-2 rounded-md font-medium text-gray-500 text-start text-theme-sm dark:text-gray-400"
-            value={selectedRange}
-            onChange={(e) => setSelectedRange(e.target.value)}
-          >
+          <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold">Aktivitas Pengguna</h2>
+          <select className="border border-gray-300 dark:bg-gray-800 p-2 rounded-md font-medium text-gray-500 text-start text-theme-sm dark:text-gray-400" value={selectedRange} onChange={(e) => setSelectedRange(e.target.value)}>
             <option value="1_month">1 Bulan Terakhir</option>
             <option value="3_months">3 Bulan Terakhir</option>
             <option value="6_months">6 Bulan Terakhir</option>
@@ -271,40 +260,19 @@ export default function Dashboard() {
             <option value="10_years">10 Tahun Terakhir</option>
           </select>
         </div>
-        <Chart
-          options={activityChartOptions}
-          series={[
-            { name: "Aktivitas", data: activityData.map((d) => d.count) },
-          ]}
-          type="line"
-          height={300}
-        />
+        <Chart options={activityChartOptions} series={[{ name: "Aktivitas", data: activityData.map((d) => d.count) }]} type="line" height={300} />
       </div>
 
       {/* Gender Chart */}
       <div className="py-5 rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-        <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold mx-5 mb-4">
-          Perbandingan Gender
-        </h2>
-        <Chart
-          options={genderChartOptions}
-          series={[manTotal, womanTotal]}
-          type="donut"
-          height={300}
-        />
+        <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold mx-5 mb-4">Perbandingan Gender</h2>
+        <Chart options={genderChartOptions} series={[manTotal, womanTotal]} type="donut" height={300} />
       </div>
 
       {/* Age Chart */}
       <div className="py-5 rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-        <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold mx-5 mb-4">
-          Distribusi Usia
-        </h2>
-        <Chart
-          options={ageChartOptions}
-          series={[{ name: "Jumlah", data: Object.values(ageRanges) }]}
-          type="bar"
-          height={300}
-        />
+        <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold mx-5 mb-4">Distribusi Usia</h2>
+        <Chart options={ageChartOptions} series={[{ name: "Jumlah", data: Object.values(ageRanges) }]} type="bar" height={300} />
       </div>
     </div>
   );

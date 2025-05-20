@@ -14,7 +14,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <GridShape />
             <div className="flex flex-col items-center max-w-xs">
               <Link to="/" className="block mb-4">
-                <img width={261} height={78} src="/images/logo/parky-logo.png" alt="Logo" />
+                <img className="dark:hidden my-4" src="/images/logo/parky-logo-b.png" alt="Logo" width={261} height={78} />
+                <img className="hidden dark:block" src="/images/logo/parky-logo.png" alt="Logo" width={261} height={78} />
               </Link>
             </div>
           </div>

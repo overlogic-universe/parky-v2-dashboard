@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 import Videos from "./pages/UiElements/Videos";
@@ -19,10 +18,12 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import OnlyGuestRoute from "./layout/OnlyGuestRoute";
 import PrivateRoute from "./layout/PrivateRoute";
-import UserTablePage from "./pages/Tables/UserTablePage";
 import VehicleTable from "./components/tables/VehicleTables/VehicleTable";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
-import QrScannerPage from "./pages/QrScanner/QrScannerPage";
+import CreateParkingAttendantPage from "./pages/CreateParkingAttendantPage.tsx/CreateParkingAttendantPage";
+import CreateStudentPage from "./pages/CreateStudent/CreateStudentPage";
+import ParkingAttendantTablePage from "./pages/Tables/ParkingAttendantTablePage";
+import StudentTablePage from "./pages/Tables/StudentTablePage";
 
 export default function App() {
   return (
@@ -49,11 +50,12 @@ export default function App() {
             }
           >
             <Route index path="/" element={<DashboardPage />} />
-            <Route index path="/users" element={<UserTablePage />} />
+            <Route index path="/student-table" element={<StudentTablePage />} />
+            <Route index path="/parking-attendant-table" element={<ParkingAttendantTablePage />} />
             <Route index path="/vehicles" element={<VehicleTable />} />
-            <Route index path="/qr-scan" element={<QrScannerPage />} />
 
-            <Route index path="/signup" element={<SignUp />} />
+            <Route index path="/create-parking-attendant" element={<CreateParkingAttendantPage />} />
+            <Route index path="/create-student" element={<CreateStudentPage />} />
             {/* <Route index path="/user-detail" element={<PatientDetailsPage />} />
             <Route path="/userprofiles" element={<UserProfiles />} />
             <Route path="/videos" element={<Videos />} />

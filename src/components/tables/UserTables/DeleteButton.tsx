@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import Button from "../../ui/button/Button";
-import { User } from "./UserTable";
+import { User } from "./StudentTable";
 import { db } from "../../../configuration";
 import { Modal } from "../../ui/modal";
 
@@ -70,31 +70,17 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
 
   return (
     <>
-      <Button
-        size="sm"
-        variant="primary"
-        className="bg-red-400 hover:bg-red-500"
-        onClick={handleDeleteClick}
-      >
+      <Button size="sm" variant="primary" className="bg-red-400 hover:bg-red-500" onClick={handleDeleteClick}>
         Delete
       </Button>
 
       {/* Modal Konfirmasi Penghapusan */}
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={handleDeleteCancel}
-        className="max-w-md p-6 absolute"
-      >
+      <Modal isOpen={showDeleteModal} onClose={handleDeleteCancel} className="max-w-md p-6 absolute">
         <div className="text-center">
           <h3 className="text-lg font-semibold">Konfirmasi Penghapusan</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Apakah Anda yakin ingin menghapus data ini?
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Apakah Anda yakin ingin menghapus data ini?</p>
           <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={handleDeleteCancel}
-              className="px-4 py-2 bg-gray-300 text-black rounded-lg"
-            >
+            <button onClick={handleDeleteCancel} className="px-4 py-2 bg-gray-300 text-black rounded-lg">
               Batal
             </button>
             <button
@@ -109,23 +95,12 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
       </Modal>
 
       {/* Modal Success */}
-      <Modal
-        isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
-        className="max-w-md p-6 absolute"
-      >
+      <Modal isOpen={showSuccessModal} onClose={handleSuccessModalClose} className="max-w-md p-6 absolute">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-green-500">
-            Penghapusan Berhasil!
-          </h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Data telah berhasil dihapus.
-          </p>
+          <h3 className="text-lg font-semibold text-green-500">Penghapusan Berhasil!</h3>
+          <p className="mt-2 text-sm text-gray-600">Data telah berhasil dihapus.</p>
           <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={handleSuccessModalClose}
-              className="px-4 py-2 bg-green-400 hover:bg-green-500 text-white rounded-lg"
-            >
+            <button onClick={handleSuccessModalClose} className="px-4 py-2 bg-green-400 hover:bg-green-500 text-white rounded-lg">
               OK
             </button>
           </div>

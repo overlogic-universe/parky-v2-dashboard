@@ -14,7 +14,8 @@ export default function OnlyGuestRoute({ children }: Props) {
   if (loading) {
     return (
       <div className="fixed inset-0 flex flex-col justify-center items-center bg-white">
-        <img className="text-center mb-3" src="/images/logo/parky-logo.png" height={300} width={300} />
+        <img className="dark:hidden text-center mb-3" src="/images/logo/parky-logo-b.png" alt="Logo" height={300} width={300} />
+        <img className="hidden dark:block text-center mb-3" src="/images/logo/parky-logo.png" alt="Logo" height={300} width={300} />
         <div className="animate-spin h-10 w-10 border-t-3 border-brand-500 rounded-full mx-auto"></div>
       </div>
     );
