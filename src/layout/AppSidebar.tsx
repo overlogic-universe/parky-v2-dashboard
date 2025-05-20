@@ -77,18 +77,19 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
-    icon: <UserIcon />,
-    name: "Tabel Pengguna",
+    icon: <TableIcon />,
+    name: "Tabel",
     subItems: [
       { name: "Tabel Mahasiswa", path: "/student-table", pro: false },
       { name: "Tabel Petugas", path: "/parking-attendant-table", pro: false },
+      { name: "Tabel Tempat Parkir", path: "/parking-lot-table", pro: false },
     ],
   },
-  {
-    icon: <TimeIcon />,
-    name: "Aktivitas Parkir",
-    path: "/histories",
-  },
+  // {
+  //   icon: <TimeIcon />,
+  //   name: "Aktivitas Parkir",
+  //   path: "/histories",
+  // },
   {
     icon: <PlusIcon />,
     name: "Tambah Data",

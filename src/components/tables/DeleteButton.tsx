@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
-import Button from "../../ui/button/Button";
+import Button from "../ui/button/Button";
 import { User } from "./StudentTable";
-import { db } from "../../../configuration";
-import { Modal } from "../../ui/modal";
+import { db } from "../../configuration";
+import { Modal } from "../ui/modal";
 
 interface ButtonDeleteProps {
   user: User;

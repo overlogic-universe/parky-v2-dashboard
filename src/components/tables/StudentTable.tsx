@@ -1,14 +1,8 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../configuration";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
-import Button from "../../ui/button/Button";
+import { db } from "../../configuration";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
+import Button from "../ui/button/Button";
 import DeleteButton from "./DeleteButton";
 import { useNavigate } from "react-router";
 
@@ -46,9 +40,7 @@ export default function StudentTable() {
         }));
 
         const merged = studentsData.map((student) => {
-          const matchedVehicle = vehiclesData.find(
-            (v) => v.student_id === student.id
-          );
+          const matchedVehicle = vehiclesData.find((v) => v.student_id === student.id);
           return {
             ...student,
             plate: matchedVehicle?.plate || "-",
@@ -65,9 +57,7 @@ export default function StudentTable() {
     fetchData();
   }, []);
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleDetail = (studentId: string) => {
     console.log("Detail student", studentId);
@@ -112,69 +102,37 @@ export default function StudentTable() {
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Nama
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Email
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 NIM
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Plat Nomor
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Action
               </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {filteredStudents.map((student, index) => (
-              <TableRow
-                key={student.id}
-                className={`py-5 ${
-                  index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""
-                } hover:bg-gray-100 dark:hover:bg-gray-600`}
-              >
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {student.name}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {student.email}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {student.nim}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {student.plate}
-                </TableCell>
+              <TableRow key={student.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""} hover:bg-gray-100 dark:hover:bg-gray-600`}>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{student.name}</TableCell>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{student.email}</TableCell>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{student.nim}</TableCell>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{student.plate}</TableCell>
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">
                     {/* <Button size="sm" variant="primary" onClick={() => navigate("/student-detail", { state: { patient: patient } })}> */}
                     <Button size="sm" variant="primary">
                       Detail
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => alert(`Edit ${student.name}`)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => alert(`Edit ${student.name}`)}>
                       Edit
                     </Button>
                     <DeleteButton user={student} />
@@ -185,9 +143,7 @@ export default function StudentTable() {
           </TableBody>
         </Table>
       ) : (
-        <div className="text-center text-theme-sm text-gray-500 pt-5">
-          Student tidak ditemukan
-        </div>
+        <div className="text-center text-theme-sm text-gray-500 pt-5">Student tidak ditemukan</div>
       )}
     </div>
   );
