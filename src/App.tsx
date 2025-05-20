@@ -21,9 +21,10 @@ import PrivateRoute from "./layout/PrivateRoute";
 import VehicleTable from "./components/tables/VehicleTables/VehicleTable";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import CreateParkingAttendantPage from "./pages/CreateParkingAttendantPage.tsx/CreateParkingAttendantPage";
-import CreateStudentPage from "./pages/CreateStudent/CreateStudentPage";
+import CreateStudentPage from "./pages/CreateStudentPage/CreateStudentPage";
 import ParkingAttendantTablePage from "./pages/Tables/ParkingAttendantTablePage";
 import StudentTablePage from "./pages/Tables/StudentTablePage";
+import CreateParkingLotPage from "./pages/CreateParkingLotPage/CreateParkingLotPage";
 
 export default function App() {
   return (
@@ -56,6 +57,7 @@ export default function App() {
 
             <Route index path="/create-parking-attendant" element={<CreateParkingAttendantPage />} />
             <Route index path="/create-student" element={<CreateStudentPage />} />
+            <Route index path="/create-parking-lot" element={<CreateParkingLotPage />} />
             {/* <Route index path="/user-detail" element={<PatientDetailsPage />} />
             <Route path="/userprofiles" element={<UserProfiles />} />
             <Route path="/videos" element={<Videos />} />

@@ -91,10 +91,11 @@ const navItems: NavItem[] = [
   },
   {
     icon: <PlusIcon />,
-    name: "Tambah Pengguna",
+    name: "Tambah Data",
     subItems: [
       { name: "Daftar Mahasiswa Baru", path: "/create-student", pro: false },
       { name: "Daftar Petugas Baru", path: "/create-parking-attendant", pro: false },
+      { name: "Daftar Tempat Parkir Baru", path: "/create-parking-lot", pro: false },
     ],
   },
   {

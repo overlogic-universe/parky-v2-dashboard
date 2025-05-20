@@ -776,3 +776,55 @@ span.flatpickr-weekday,
 .simplebar-scrollbar.simplebar-visible:before {
   @apply opacity-100;
 }
+
+/* Tambahkan ini di akhir file CSS kamu */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.react-datepicker__time-container {
+  z-index: 9999999;
+  background-color: white;
+  border: 1px solid #d1d5db; /* Tailwind: border-gray-300 */
+  border-radius: 0.5rem;      /* Tailwind: rounded-lg */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+  overflow: hidden;
+}
+
+.react-datepicker__time {
+  background-color: white;
+}
+
+.react-datepicker__time-box {
+  width: 100%;
+}
+
+
+.react-datepicker__time-list {
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.react-datepicker__time-list-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #111827; /* Tailwind: text-gray-900 */
+}
+
+.react-datepicker__time-list-item:hover,
+.react-datepicker__time-list-item--selected {
+  background-color: #6366f1; /* Tailwind: indigo-500 */
+  color: white;
+  font-weight: 500;
+}
+
+
