@@ -29,7 +29,9 @@ export default function SignUpForm() {
     }
 
     if (!emailRegex.test(email)) {
-      setShowLoginErrorAlert("Nama tidak boleh kosong!. Contoh: johndoe@gmail.com.");
+      setShowLoginErrorAlert(
+        "Nama tidak boleh kosong!. Contoh: johndoe@gmail.com."
+      );
       return;
     }
 
@@ -41,7 +43,11 @@ export default function SignUpForm() {
     try {
       setLoading(true);
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Simpan data tambahan ke Firestore
@@ -65,12 +71,20 @@ export default function SignUpForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
-            <h1 className="mb-3 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">Daftarkan Admin!</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Daftarkan admin baru!</p>
+            <h1 className="mb-3 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+              Daftarkan Petugas!
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Daftarkan petugas baru!
+            </p>
 
             {showLoginErrorAlert && (
               <div className="my-5">
-                <Alert variant="error" title="Gagal Membuat Akun" message={showLoginErrorAlert} />
+                <Alert
+                  variant="error"
+                  title="Gagal Membuat Akun"
+                  message={showLoginErrorAlert}
+                />
               </div>
             )}
 
@@ -80,27 +94,57 @@ export default function SignUpForm() {
                   <Label>
                     Nama<span className="text-error-500">*</span>
                   </Label>
-                  <Input type="text" id="fname" name="fname" placeholder="Masukkan nama" value={name} onChange={(e) => setName(e.target.value)} />
+                  <Input
+                    type="text"
+                    id="fname"
+                    name="fname"
+                    placeholder="Masukkan nama"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>
                     Email<span className="text-error-500">*</span>
                   </Label>
-                  <Input type="email" id="email" name="email" placeholder="Masukkan email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Masukkan email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>
                     Password<span className="text-error-500">*</span>
                   </Label>
                   <div className="relative">
-                    <Input placeholder="Masukkan password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <span onClick={() => setShowPassword(!showPassword)} className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2">
-                      {showPassword ? <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" /> : <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />}
+                    <Input
+                      placeholder="Masukkan password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                    >
+                      {showPassword ? (
+                        <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                      ) : (
+                        <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                      )}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <button type="submit" disabled={loading} className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
+                  >
                     {loading ? "Mendaftarkan..." : "Daftar"}
                   </button>
                 </div>

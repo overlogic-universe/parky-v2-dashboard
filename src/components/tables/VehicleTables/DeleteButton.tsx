@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import Button from "../../ui/button/Button";
-import { User } from "./UserTable";
+import { Vehicle } from "./VehicleTable";
 import { db } from "../../../configuration";
 import { Modal } from "../../ui/modal";
 
 interface ButtonDeleteProps {
-  user: User;
+  vehicle: Vehicle;
 }
 
-const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
+const ButtonDelete: React.FC<ButtonDeleteProps> = ({ vehicle }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -17,13 +17,13 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
   // Fungsi untuk menghapus feedback dan examination results
   // async function deleteFeedbackAndExaminationResults() {
   //   try {
-  //     const feedbackRef = doc(db, "feedbacks", user.feedbackId);
+  //     const feedbackRef = doc(db, "feedbacks", vehicle.feedbackId);
   //     await deleteDoc(feedbackRef);
 
   //     const examinationResultRef = doc(
   //       db,
   //       "examination_results",
-  //       user.examinationResultId
+  //       vehicle.examinationResultId
   //     );
   //     await deleteDoc(examinationResultRef);
 
@@ -33,21 +33,21 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
   //   }
   // }
 
-  // Fungsi untuk menghapus user
-  async function handleDeleteUser() {
+  // Fungsi untuk menghapus vehicle
+  async function handleDeleteVehicle() {
     setIsDeleting(true);
     try {
       // await deleteFeedbackAndExaminationResults();
 
-      const userRef = doc(db, "users", user.id);
-      await deleteDoc(userRef);
+      const vehicleRef = doc(db, "vehicles", vehicle.id);
+      await deleteDoc(vehicleRef);
 
-      console.log("User berhasil dihapus.");
+      console.log("vehicle berhasil dihapus.");
       setIsDeleting(false);
       setShowDeleteModal(false); // Menutup modal konfirmasi
       setShowSuccessModal(true); // Menampilkan modal success
     } catch (error) {
-      console.error("Error menghapus user:", error);
+      console.error("Error menghapus vehicle:", error);
       setIsDeleting(false); // Reset loading state jika ada error
     }
   }
@@ -98,7 +98,7 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
               Batal
             </button>
             <button
-              onClick={handleDeleteUser}
+              onClick={handleDeleteVehicle}
               className="px-4 py-2 bg-red-400 hover:bg-red-500 text-white rounded-lg"
               disabled={isDeleting} // Disabled jika sedang menghapus
             >

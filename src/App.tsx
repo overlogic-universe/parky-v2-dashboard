@@ -19,9 +19,10 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import OnlyGuestRoute from "./layout/OnlyGuestRoute";
 import PrivateRoute from "./layout/PrivateRoute";
-import PatientDetailsPage from "./pages/PatientDetails/PatientDetailsPage";
 import UserTablePage from "./pages/Tables/UserTablePage";
+import VehicleTable from "./components/tables/VehicleTables/VehicleTable";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import QrScannerPage from "./pages/QrScanner/QrScannerPage";
 
 export default function App() {
   return (
@@ -48,9 +49,12 @@ export default function App() {
             }
           >
             <Route index path="/" element={<DashboardPage />} />
-            <Route index path="/user-table" element={<UserTablePage />} />
+            <Route index path="/users" element={<UserTablePage />} />
+            <Route index path="/vehicles" element={<VehicleTable />} />
+            <Route index path="/qr-scan" element={<QrScannerPage />} />
+
             <Route index path="/signup" element={<SignUp />} />
-            <Route index path="/user-detail" element={<PatientDetailsPage />} />
+            {/* <Route index path="/user-detail" element={<PatientDetailsPage />} />
             <Route path="/userprofiles" element={<UserProfiles />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/images" element={<Images />} />
@@ -63,7 +67,7 @@ export default function App() {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/basictables" element={<BasicTables />} />
             <Route path="/formelements" element={<FormElements />} />
-            <Route path="/blank" element={<Blank />} />
+            <Route path="/blank" element={<Blank />} /> */}
           </Route>
 
           {/* Fallback Route (Page Not Found) */}

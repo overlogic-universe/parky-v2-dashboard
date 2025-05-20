@@ -5,8 +5,8 @@ import Dashboard from "../../components/Dashboard/Dashboard";
 export default function DashboardPage() {
   return (
     <>
-      <PageMeta title="Dashboard 📊" description="This is the dashboard of neurotic" />
-      <PageBreadcrumb pageTitle="Dashboard 📊" />
+      <PageMeta title="Dasbor 📊" description="Dasbor Parky" />
+      <PageBreadcrumb pageTitle="Dasbor 📊" />
       <div className="space-y-6">
         <Dashboard />
       </div>

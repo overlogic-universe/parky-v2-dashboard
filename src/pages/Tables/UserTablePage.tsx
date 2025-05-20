@@ -5,8 +5,8 @@ import UserTable from "../../components/tables/UserTables/UserTable";
 export default function UserTablePage() {
   return (
     <>
-      <PageMeta title="Tabel Pasien 🏥" description="This is the user table of neurotic" />
-      <PageBreadcrumb pageTitle="Tabel Pasien 🏥" />
+      <PageMeta title="User 🧑‍💻" description="This is the user table of Parky" />
+      <PageBreadcrumb pageTitle="Pengguna 🧑‍💻" />
       <div className="space-y-6">
         <UserTable />
       </div>
