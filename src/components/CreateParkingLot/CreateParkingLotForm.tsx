@@ -70,7 +70,7 @@ export default function CreateParkingLotForm() {
       is_active: isActive,
       inactive_description: isActive ? null : inactiveDescription,
       created_at: new Date(),
-      updated_at: null,
+      updated_at: new Date(),
     };
 
     await setDoc(doc(db, "parking_lots", parkingLotId), parkingLotData);
@@ -86,7 +86,7 @@ export default function CreateParkingLotForm() {
         closed_time: schedule.closed_time ? format(schedule.closed_time, "HH:mm") : null,
         is_closed: schedule.is_closed,
         created_at: new Date(),
-        updated_at: null,
+        updated_at: new Date(),
       });
 
       await addDoc(collection(db, "parking_lots_has_parking_schedules"), {
@@ -94,7 +94,7 @@ export default function CreateParkingLotForm() {
         parking_lot_id: parkingLotId,
         parking_schedule_id: scheduleId,
         created_at: new Date(),
-        updated_at: null,
+        updated_at: new Date(),
       });
     }
 

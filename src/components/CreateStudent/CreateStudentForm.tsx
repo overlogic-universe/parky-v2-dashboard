@@ -13,6 +13,8 @@ import GeneratedPasswordInformation from "../common/GeneratedPasswordInformation
 export default function CreateParkingStudentForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [nim, setNim] = useState("");
+
   const [plate, setPlate] = useState(""); // ← Tambah state plate kendaraan
   const [loading, setLoading] = useState(false);
   const [showLoginErrorAlert, setShowLoginErrorAlert] = useState("");
@@ -26,6 +28,11 @@ export default function CreateParkingStudentForm() {
 
     if (name.trim() === "") {
       setShowLoginErrorAlert("Nama tidak boleh kosong!");
+      return;
+    }
+
+    if (nim.trim() === "") {
+      setShowLoginErrorAlert("NIM tidak boleh kosong!");
       return;
     }
 
@@ -52,7 +59,7 @@ export default function CreateParkingStudentForm() {
           name,
           email,
           password: generatedPassword,
-          role: "petugas",
+          role: "mahasiswa",
         }),
       });
 
@@ -71,9 +78,10 @@ export default function CreateParkingStudentForm() {
         id: studentId,
         qr_code_id: uuidv4(), // ← Generate QR ID (bisa ganti pakai logic kamu)
         name,
+        nim,
         email,
         created_at: new Date(),
-        updated_at: null,
+        updated_at: new Date(),
       });
 
       // Simpan data kendaraan
@@ -83,7 +91,7 @@ export default function CreateParkingStudentForm() {
         student_id: studentId,
         plate,
         created_at: new Date(),
-        updated_at: null,
+        updated_at: new Date(),
       });
 
       navigate("/");
@@ -106,10 +114,17 @@ export default function CreateParkingStudentForm() {
               <div className="space-y-5">
                 <div>
                   <Label>
-                    Nama<span className="text-error-500">*</span>
+                    Nama Lengkap<span className="text-error-500">*</span>
                   </Label>
-                  <Input type="text" placeholder="Masukkan nama" value={name} onChange={(e) => setName(e.target.value)} />
+                  <Input type="text" placeholder="Masukkan nama lengkap" value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
+                <div>
+                  <Label>
+                    NIM<span className="text-error-500">*</span>
+                  </Label>
+                  <Input type="text" placeholder="Masukkan NIM" value={nim} onChange={(e) => setNim(e.target.value)} />
+                </div>
+
                 <div>
                   <Label>
                     Email<span className="text-error-500">*</span>

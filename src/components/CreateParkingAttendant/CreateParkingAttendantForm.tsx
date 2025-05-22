@@ -65,7 +65,7 @@ export default function CreateParkingAttendantForm() {
         name,
         email,
         created_at: new Date(),
-        updated_at: null,
+        updated_at: new Date(),
       });
 
       navigate("/");
