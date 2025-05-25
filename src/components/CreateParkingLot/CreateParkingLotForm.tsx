@@ -129,8 +129,8 @@ export default function CreateParkingLotForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-6 bg-white shadow-xl rounded-2xl space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800">Tambah Tempat Parkir</h2>
+    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-6 shadow-xl rounded-2xl space-y-8 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-400">Tambah Tempat Parkir</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
@@ -152,8 +152,8 @@ export default function CreateParkingLotForm() {
         <Label className="text-xl font-semibold text-gray-800 mb-4">Jadwal Operasional</Label>
         <div className="space-y-4">
           {daysOfWeek.map((day) => (
-            <div key={day} className="border p-5 rounded-xl bg-white shadow-sm space-y-4">
-              <h3 className="font-semibold capitalize text-lg text-gray-800">{dayLabels[day]}</h3>
+            <div key={day} className=" p-5 rounded-xl shadow-sm space-y-4 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+              <h3 className="font-semibold capitalize text-lg text-gray-800 dark:text-gray-400">{dayLabels[day]}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
                 {/* Jam Buka */}
                 <DatePicker
@@ -173,7 +173,7 @@ export default function CreateParkingLotForm() {
                   placeholderText="Jam Buka"
                   calendarClassName="react-datepicker"
                   popperClassName="react-datepicker-popper"
-                  className="w-full z-10 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full rounded-lg dark:text-white px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.05]"
                 />
 
                 {/* Jam Tutup */}
@@ -194,12 +194,12 @@ export default function CreateParkingLotForm() {
                   placeholderText="Jam Tutup"
                   calendarClassName="react-datepicker"
                   popperClassName="react-datepicker-popper"
-                  className=" w-full z-50 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full rounded-lg dark:text-white px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.05]"
                 />
 
                 {/* Toggle Tutup */}
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-800">Tutup</span>
+                  <span className="text-sm text-gray-800 dark:text-gray-400">Tutup</span>
                   <Label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -218,7 +218,7 @@ export default function CreateParkingLotForm() {
                 </div>
               </div>
               <div>
-                <Label className="font-semibold capitalize text-lg text-gray-800">Petugas Parkir</Label>
+                <Label className="font-semibold capitalize text-sm text-gray-800">Petugas Parkir</Label>
                 <AttendantDropdown
                   selectedId={assignments[day]}
                   onSelect={(id) =>
@@ -237,7 +237,7 @@ export default function CreateParkingLotForm() {
 
       <div>
         <label className="inline-flex items-center cursor-pointer">
-          <span className="mr-2 text-sm text-gray-700">Tempat Parkir Aktif?</span>
+          <span className="mr-2 text-sm text-gray-700 dark:text-gray-400">Tempat Parkir Aktif?</span>
           <div className="relative">
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="sr-only peer" />
             <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-indigo-600 transition-colors"></div>

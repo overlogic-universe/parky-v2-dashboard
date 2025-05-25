@@ -23,14 +23,14 @@ export const AttendantDropdown: React.FC<AttendantDropdownProps> = ({
     <div className="w-1/2">
       <button
         type="button"
-        className="dropdown-toggle w-full rounded-md border px-4 py-2 text-left text-sm text-gray-700 bg-white hover:bg-gray-100"
+        className="dropdown-toggle w-full rounded-md px-4 py-2 text-left text-sm dark:hover:bg-gray-800 dark:text-gray-400 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         {selectedName}
       </button>
-      <Dropdown className="relative" isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <Dropdown className="relative dark:bg-white/[0.03]" isOpen={isOpen} onClose={() => setIsOpen(false)}>
         {attendants.map((attendant) => (
-          <DropdownItem className="font-bold"
+          <DropdownItem className="font-bold text-theme-sm dark:text-gray-200 dark:hover:bg-gray-800"
             key={attendant.id}
             onItemClick={() => {
               onSelect(attendant.id);

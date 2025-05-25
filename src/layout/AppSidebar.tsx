@@ -73,17 +73,17 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Dasboard",
+    name: "Dashboard",
     path: "/",
   },
   {
     icon: <CalenderIcon />,
-    name: "Schedule",
-    path: "/schedule"
+    name: "Jadwal",
+    path: "/schedule",
   },
   {
     icon: <TableIcon />,
-    name: "Tabel",
+    name: "Tabel Pengguna",
     subItems: [
       { name: "Tabel Mahasiswa", path: "/student-table", pro: false },
       { name: "Tabel Petugas", path: "/parking-attendant-table", pro: false },
@@ -249,7 +249,10 @@ const AppSidebar: React.FC = () => {
               <img className="hidden dark:block" src="/images/logo/parky-logo.png" alt="Logo" width={150} height={40} />
             </>
           ) : (
-            <img src="/images/logo/parky-logo-square.png" alt="Logo" width={20} height={20} />
+            <>
+              <img className="dark:hidden my-4" src="/images/logo/parky-logo-b.png" alt="Logo" width={20} height={20} />
+              <img className="hidden dark:block" src="/images/logo/parky-logo.png" alt="Logo" width={20} height={20} />
+            </>
           )}
         </div>
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
