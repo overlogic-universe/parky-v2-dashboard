@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Alert from "../ui/alert/Alert";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../configuration";
 import { doc, setDoc } from "firebase/firestore";
+import { generateRandomPassword } from "../../utils/GetRandomPassword";
+import GeneratedPasswordInformation from "../common/GeneratedPasswordInformation";
 
-export default function SignUpForm() {
-  const [showPassword, setShowPassword] = useState(false);
+export default function CreateParkingAttendantForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showLoginErrorAlert, setShowLoginErrorAlert] = useState("");
   const navigate = useNavigate();
@@ -29,32 +28,74 @@ export default function SignUpForm() {
     }
 
     if (!emailRegex.test(email)) {
-      setShowLoginErrorAlert("Nama tidak boleh kosong!. Contoh: johndoe@gmail.com.");
-      return;
-    }
-
-    if (password.length < 8) {
-      setShowLoginErrorAlert("Password minimal 8 karakter!");
+      setShowLoginErrorAlert("Email tidak valid. Contoh: johndoe@gmail.com.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // 🔐 Auto generate password
+      const generatedPassword = generateRandomPassword(); // ambil 12 karakter biar nggak kepanjangan
+
+      // Kirim email ke petugas
+      const response = await fetch("http://localhost:5000/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          password: generatedPassword,
+          role: "petugas",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Gagal mengirim email:", errorText);
+        throw new Error("Gagal mengirim email notifikasi");
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, generatedPassword);
       const user = userCredential.user;
 
       // Simpan data tambahan ke Firestore
-      await setDoc(doc(db, "admins", user.uid), {
+      await setDoc(doc(db, "parking_attendants", user.uid), {
         id: user.uid,
         name,
         email,
-        createdAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       });
 
       navigate("/");
     } catch (error: any) {
-      setShowLoginErrorAlert("Gagal membuat akun");
+      console.error(error);
+
+      let errorMessage = "Terjadi kesalahan saat membuat akun.";
+
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Email sudah terdaftar. Silakan gunakan email lain.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Format email tidak valid.";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password terlalu lemah.";
+          break;
+        case "auth/operation-not-allowed":
+          errorMessage = "Pembuatan akun dengan email dan password tidak diizinkan.";
+          break;
+        case "Gagal mengirim email notifikasi":
+          errorMessage = "Gagal mengirim email notifikasi.";
+          break;
+        default:
+          errorMessage = "Gagal membuat akun. Silakan coba lagi.";
+          break;
+      }
+
+      setShowLoginErrorAlert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -65,15 +106,9 @@ export default function SignUpForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
-            <h1 className="mb-3 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">Daftarkan Admin!</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Daftarkan admin baru!</p>
-
-            {showLoginErrorAlert && (
-              <div className="my-5">
-                <Alert variant="error" title="Gagal Membuat Akun" message={showLoginErrorAlert} />
-              </div>
-            )}
-
+            <h1 className="mb-3 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">Daftarkan Petugas!</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Daftarkan petugas baru!</p>
+            <GeneratedPasswordInformation />
             <form className="pt-5" onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div>
@@ -88,17 +123,11 @@ export default function SignUpForm() {
                   </Label>
                   <Input type="email" id="email" name="email" placeholder="Masukkan email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
-                <div>
-                  <Label>
-                    Password<span className="text-error-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Input placeholder="Masukkan password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <span onClick={() => setShowPassword(!showPassword)} className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2">
-                      {showPassword ? <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" /> : <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />}
-                    </span>
+                {showLoginErrorAlert && (
+                  <div className="my-5">
+                    <Alert variant="error" title="Gagal Membuat Akun" message={showLoginErrorAlert} />
                   </div>
-                </div>
+                )}
                 <div>
                   <button type="submit" disabled={loading} className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
                     {loading ? "Mendaftarkan..." : "Daftar"}

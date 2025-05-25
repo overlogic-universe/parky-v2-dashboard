@@ -1,5 +1,5 @@
 import { doc, getDoc } from "firebase/firestore";
-import { Patient } from "../tables/UserTables/UserTable";
+import { User } from "../tables/StudentTables/StudentTable";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
 import { db } from "../../configuration";
@@ -21,9 +21,9 @@ export interface Feedback {
   rating: number;
 }
 
-const PatientDetails = () => {
+const UserDetails = () => {
   const location = useLocation();
-  const { patient } = location.state as { patient: Patient };
+  const { user } = location.state as { user: User };
 
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -32,48 +32,128 @@ const PatientDetails = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        if (patient.feedbackId) {
-          const feedbackDoc = await getDoc(doc(db, "feedbacks", patient.feedbackId));
+        if (user.feedbackId) {
+          const feedbackDoc = await getDoc(doc(db, "feedbacks", user.feedbackId));
           if (feedbackDoc.exists()) {
             setFeedback(feedbackDoc.data() as Feedback);
           }
         }
 
-        if (patient.examinationResultId) {
-          const resultDoc = await getDoc(doc(db, "examination_results", patient.examinationResultId));
+        if (user.examinationResultId) {
+          const resultDoc = await getDoc(doc(db, "examination_results", user.examinationResultId));
           if (resultDoc.exists()) {
             setExaminationResult(resultDoc.data() as ExaminationResult);
           }
         }
       } catch (err) {
-        console.error("Error loading patient details:", err);
+        console.error("Error loading user details:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDetails();
-  }, [patient.feedbackId, patient.examinationResultId]);
+  }, [user.feedbackId, user.examinationResultId]);
 
   const footPoints = [
-    { label: "a", top: "11%", left: "34%", detected: examinationResult?.kiri["a"].detected },
-    { label: "b", top: "8%", left: "18%", detected: examinationResult?.kiri["b"].detected },
-    { label: "c", top: "32%", left: "36%", detected: examinationResult?.kiri["c"].detected },
-    { label: "d", top: "31%", left: "20%", detected: examinationResult?.kiri["d"].detected },
-    { label: "e", top: "36%", left: "7%", detected: examinationResult?.kiri["e"].detected },
-    { label: "f", top: "55%", left: "8%", detected: examinationResult?.kiri["f"].detected },
-    { label: "g", top: "73%", left: "14%", detected: examinationResult?.kiri["g"].detected },
-    { label: "h", top: "92%", left: "21%", detected: examinationResult?.kiri["h"].detected },
+    {
+      label: "a",
+      top: "11%",
+      left: "34%",
+      detected: examinationResult?.kiri["a"].detected,
+    },
+    {
+      label: "b",
+      top: "8%",
+      left: "18%",
+      detected: examinationResult?.kiri["b"].detected,
+    },
+    {
+      label: "c",
+      top: "32%",
+      left: "36%",
+      detected: examinationResult?.kiri["c"].detected,
+    },
+    {
+      label: "d",
+      top: "31%",
+      left: "20%",
+      detected: examinationResult?.kiri["d"].detected,
+    },
+    {
+      label: "e",
+      top: "36%",
+      left: "7%",
+      detected: examinationResult?.kiri["e"].detected,
+    },
+    {
+      label: "f",
+      top: "55%",
+      left: "8%",
+      detected: examinationResult?.kiri["f"].detected,
+    },
+    {
+      label: "g",
+      top: "73%",
+      left: "14%",
+      detected: examinationResult?.kiri["g"].detected,
+    },
+    {
+      label: "h",
+      top: "92%",
+      left: "21%",
+      detected: examinationResult?.kiri["h"].detected,
+    },
 
     // kaki kanan
-    { label: "a", top: "11%", left: "66%", detected: examinationResult?.kanan["a"].detected },
-    { label: "b", top: "8%", left: "82%", detected: examinationResult?.kanan["b"].detected },
-    { label: "c", top: "32%", left: "65%", detected: examinationResult?.kanan["c"].detected },
-    { label: "d", top: "31%", left: "80%", detected: examinationResult?.kanan["d"].detected },
-    { label: "e", top: "36%", left: "93%", detected: examinationResult?.kanan["e"].detected },
-    { label: "f", top: "55%", left: "92%", detected: examinationResult?.kanan["f"].detected },
-    { label: "g", top: "73%", left: "86%", detected: examinationResult?.kanan["g"].detected },
-    { label: "h", top: "92%", left: "79%", detected: examinationResult?.kanan["h"].detected },
+    {
+      label: "a",
+      top: "11%",
+      left: "66%",
+      detected: examinationResult?.kanan["a"].detected,
+    },
+    {
+      label: "b",
+      top: "8%",
+      left: "82%",
+      detected: examinationResult?.kanan["b"].detected,
+    },
+    {
+      label: "c",
+      top: "32%",
+      left: "65%",
+      detected: examinationResult?.kanan["c"].detected,
+    },
+    {
+      label: "d",
+      top: "31%",
+      left: "80%",
+      detected: examinationResult?.kanan["d"].detected,
+    },
+    {
+      label: "e",
+      top: "36%",
+      left: "93%",
+      detected: examinationResult?.kanan["e"].detected,
+    },
+    {
+      label: "f",
+      top: "55%",
+      left: "92%",
+      detected: examinationResult?.kanan["f"].detected,
+    },
+    {
+      label: "g",
+      top: "73%",
+      left: "86%",
+      detected: examinationResult?.kanan["g"].detected,
+    },
+    {
+      label: "h",
+      top: "92%",
+      left: "79%",
+      detected: examinationResult?.kanan["h"].detected,
+    },
   ];
 
   if (loading) {
@@ -91,38 +171,39 @@ const PatientDetails = () => {
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Detail Pasien</h2>
         <hr className="mb-3" />
         <p className=" font-semibold text-gray-700 dark:text-white mb-4">
-          Tanggal Pemeriksaan:<span className="font-normal tex-xl"> {formatDateWithTime(patient.createdAt)}</span>
+          Tanggal Pemeriksaan:
+          <span className="font-normal tex-xl"> {formatDateWithTime(user.createdAt)}</span>
         </p>
         <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
           <p>
-            <span className="font-bold dark:text-white">Nama:</span> {patient.name}
+            <span className="font-bold dark:text-white">Nama:</span> {user.name}
           </p>
           <p>
-            <span className="font-bold dark:text-white">Jenis Kelamin:</span> {patient.gender}
+            <span className="font-bold dark:text-white">Jenis Kelamin:</span> {user.gender}
           </p>
           <p>
-            <span className="font-bold dark:text-white">Tgl Lahir:</span> {formatDate(patient.birthDate)}
+            <span className="font-bold dark:text-white">Tgl Lahir:</span> {formatDate(user.birthDate)}
           </p>
           <p>
-            <span className="font-bold dark:text-white">Umur:</span> {convertToAge(patient.birthDate)} tahun
+            <span className="font-bold dark:text-white">Umur:</span> {convertToAge(user.birthDate)} tahun
           </p>
           <p>
-            <span className="font-bold dark:text-white">Berat:</span> {patient.weight} kg
+            <span className="font-bold dark:text-white">Berat:</span> {user.weight} kg
           </p>
           <p>
-            <span className="font-bold dark:text-white">Tinggi:</span> {patient.height} cm
+            <span className="font-bold dark:text-white">Tinggi:</span> {user.height} cm
           </p>
           <p>
-            <span className="font-bold dark:text-white">Durasi DM:</span> {patient.dmDuration} tahun
+            <span className="font-bold dark:text-white">Durasi DM:</span> {user.dmDuration} tahun
           </p>
           <p>
-            <span className="font-bold dark:text-white">Penyakit lain:</span> {patient.otherDiseases}
+            <span className="font-bold dark:text-white">Penyakit lain:</span> {user.otherDiseases}
           </p>
           <p>
-            <span className="font-bold dark:text-white">Suku:</span> {patient.ethnicity}
+            <span className="font-bold dark:text-white">Suku:</span> {user.ethnicity}
           </p>
-          <p className={`${patient.isNeuropathy ? "text-error-500" : "text-brand-500"}`}>
-            <span className="font-bold text-gray-700 dark:text-white">Diagnosa:</span> {patient.isNeuropathy ? "Terindikasi Neuropati" : "Tidak terindikasi Neuropati"}
+          <p className={`${user.isNeuropathy ? "text-error-500" : "text-brand-500"}`}>
+            <span className="font-bold text-gray-700 dark:text-white">Diagnosa:</span> {user.isNeuropathy ? "Terindikasi Neuropati" : "Tidak terindikasi Neuropati"}
           </p>
         </div>
       </div>
@@ -192,4 +273,4 @@ const PatientDetails = () => {
   );
 };
 
-export default PatientDetails;
+export default UserDetails;

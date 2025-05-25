@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { collection, getDocs, query } from "firebase/firestore";
-import { Patient } from "../tables/UserTables/UserTable";
+import { User } from "../tables/StudentTables/StudentTable";
 import { db } from "../../configuration";
 import { convertToAge } from "../../utils/DateUtil";
 import dayjs from "dayjs";
+import EcommerceMetrics from "../ecommerce/EcommerceMetrics";
 
 export default function Dashboard() {
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patients, setPatients] = useState<User[]>([]);
   const [selectedRange, setSelectedRange] = useState<string>("1_month");
   const [activityData, setActivityData] = useState<{ date: string; count: number }[]>([]);
 
@@ -67,15 +68,14 @@ export default function Dashboard() {
   function generateDateRange(start: dayjs.Dayjs, end: dayjs.Dayjs) {
     const range = [];
     let current = end.startOf("day");
-  
+
     while (current.isAfter(start) || current.isSame(start)) {
       range.push(current.format("YYYY-MM-DD"));
       current = current.subtract(1, "day");
     }
-  
+
     return range;
   }
-  
 
   function filterActivityData() {
     const today = dayjs();
@@ -109,7 +109,7 @@ export default function Dashboard() {
 
     const filteredPatients = patients.filter((p) => {
       if (!p.createdAt) return false;
-      const createdAtDate =  p.createdAt;
+      const createdAtDate = p.createdAt;
       return dayjs(createdAtDate).isAfter(startDate) && dayjs(createdAtDate).isBefore(today.add(1, "day"));
     });
 
@@ -121,7 +121,7 @@ export default function Dashboard() {
     });
 
     filteredPatients.forEach((p) => {
-      const date = dayjs( p.createdAt).format("YYYY-MM-DD");
+      const date = dayjs(p.createdAt).format("YYYY-MM-DD");
       if (dateCountMap[date] !== undefined) {
         dateCountMap[date]++;
       }
@@ -134,7 +134,6 @@ export default function Dashboard() {
 
     setActivityData(activityArray);
   }
-
 
   // For gender chart
   const manTotal = patients.filter((p) => p.gender === "Pria").length;
@@ -176,9 +175,9 @@ export default function Dashboard() {
       labels: {
         rotate: -45,
         datetimeFormatter: {
-          year: 'yyyy',
-          month: 'MMM yyyy',
-          day: 'dd MMM',
+          year: "yyyy",
+          month: "MMM yyyy",
+          day: "dd MMM",
         },
       },
     },
@@ -246,15 +245,12 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col space-y-3">
+      <EcommerceMetrics />
       {/* Aktivitas Chart */}
       <div className="py-5 rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="flex justify-between items-center mx-5 mb-4">
           <h2 className="text-xl text-gray-700 dark:text-gray-300 font-semibold">Aktivitas Pengguna</h2>
-          <select
-            className="border border-gray-300 dark:bg-gray-800 p-2 rounded-md font-medium text-gray-500 text-start text-theme-sm dark:text-gray-400"
-            value={selectedRange}
-            onChange={(e) => setSelectedRange(e.target.value)}
-          >
+          <select className="border border-gray-300 dark:bg-gray-800 p-2 rounded-md font-medium text-gray-500 text-start text-theme-sm dark:text-gray-400" value={selectedRange} onChange={(e) => setSelectedRange(e.target.value)}>
             <option value="1_month">1 Bulan Terakhir</option>
             <option value="3_months">3 Bulan Terakhir</option>
             <option value="6_months">6 Bulan Terakhir</option>

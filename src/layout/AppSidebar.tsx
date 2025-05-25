@@ -2,7 +2,62 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 
 // Assume these icons are imported from an icon library
-import { ChevronDownIcon, GridIcon, HorizontaLDots, PlugInIcon, UserIcon } from "../icons";
+import {
+  ErrorHexaIcon,
+  AlertHexaIcon,
+  MoreDotIcon,
+  DownloadIcon,
+  FileIcon,
+  GridIcon,
+  AudioIcon,
+  VideoIcon,
+  BoltIcon,
+  PlusIcon,
+  BoxIcon,
+  CloseIcon,
+  CheckCircleIcon,
+  AlertIcon,
+  InfoIcon,
+  ErrorIcon,
+  ArrowUpIcon,
+  FolderIcon,
+  ArrowDownIcon,
+  ArrowRightIcon,
+  GroupIcon,
+  BoxIconLine,
+  ShootingStarIcon,
+  DollarLineIcon,
+  TrashBinIcon,
+  AngleUpIcon,
+  AngleDownIcon,
+  PencilIcon,
+  CheckLineIcon,
+  CloseLineIcon,
+  ChevronDownIcon,
+  PaperPlaneIcon,
+  EnvelopeIcon,
+  LockIcon,
+  UserIcon,
+  CalenderIcon,
+  EyeIcon,
+  EyeCloseIcon,
+  TimeIcon,
+  CopyIcon,
+  ChevronLeftIcon,
+  UserCircleIcon,
+  TaskIcon,
+  ListIcon,
+  TableIcon,
+  PageIcon,
+  PieChartIcon,
+  BoxCubeIcon,
+  PlugInIcon,
+  DocsIcon,
+  MailIcon,
+  HorizontaLDots,
+  ChevronUpIcon,
+  ChatIcon,
+} from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../configuration";
@@ -18,21 +73,36 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
-    name: "Dashboard",
+    name: "Dasboard",
     path: "/",
   },
   {
-    icon: <UserIcon />,
-    name: "Tabel Pasien",
-    path: "/user-table",
+    icon: <TableIcon />,
+    name: "Tabel",
+    subItems: [
+      { name: "Tabel Mahasiswa", path: "/student-table", pro: false },
+      { name: "Tabel Petugas", path: "/parking-attendant-table", pro: false },
+      { name: "Tabel Tempat Parkir", path: "/parking-lot-table", pro: false },
+    ],
+  },
+  // {
+  //   icon: <TimeIcon />,
+  //   name: "Aktivitas Parkir",
+  //   path: "/histories",
+  // },
+  {
+    icon: <PlusIcon />,
+    name: "Tambah Data",
+    subItems: [
+      { name: "Daftar Mahasiswa Baru", path: "/create-student", pro: false },
+      { name: "Daftar Petugas Baru", path: "/create-parking-attendant", pro: false },
+      { name: "Daftar Tempat Parkir Baru", path: "/create-parking-lot", pro: false },
+    ],
   },
   {
     icon: <PlugInIcon />,
     name: "Autentikasi",
-    subItems: [
-      { name: "Daftar Admin Baru", path: "/signup", pro: false },
-      { name: "Keluar", path: "/logout", pro: false },
-    ],
+    subItems: [{ name: "Keluar", path: "/logout", pro: false }],
   },
 ];
 
@@ -170,7 +240,7 @@ const AppSidebar: React.FC = () => {
         <div className={`justify-center items-center py-1 flex`}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <img className="dark:hidden" src="/images/logo/parky-logo.png" alt="Logo" width={150} height={40} />
+              <img className="dark:hidden my-4" src="/images/logo/parky-logo-b.png" alt="Logo" width={120} height={40} />
               <img className="hidden dark:block" src="/images/logo/parky-logo.png" alt="Logo" width={150} height={40} />
             </>
           ) : (

@@ -1,41 +1,45 @@
 import { useState } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
-import Button from "../../ui/button/Button";
-import { Patient } from "./UserTable";
-import { db } from "../../../configuration";
-import { Modal } from "../../ui/modal";
+import Button from "../ui/button/Button";
+import { User } from "./StudentTable";
+import { db } from "../../configuration";
+import { Modal } from "../ui/modal";
 
 interface ButtonDeleteProps {
-  patient: Patient;
+  user: User;
 }
 
-const ButtonDelete: React.FC<ButtonDeleteProps> = ({ patient }) => {
+const ButtonDelete: React.FC<ButtonDeleteProps> = ({ user }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Fungsi untuk menghapus feedback dan examination results
-  async function deleteFeedbackAndExaminationResults() {
-    try {
-      const feedbackRef = doc(db, "feedbacks", patient.feedbackId);
-      await deleteDoc(feedbackRef);
+  // async function deleteFeedbackAndExaminationResults() {
+  //   try {
+  //     const feedbackRef = doc(db, "feedbacks", user.feedbackId);
+  //     await deleteDoc(feedbackRef);
 
-      const examinationResultRef = doc(db, "examination_results", patient.examinationResultId);
-      await deleteDoc(examinationResultRef);
+  //     const examinationResultRef = doc(
+  //       db,
+  //       "examination_results",
+  //       user.examinationResultId
+  //     );
+  //     await deleteDoc(examinationResultRef);
 
-      console.log("Feedback dan Examination Results berhasil dihapus.");
-    } catch (error) {
-      console.error("Error menghapus feedback dan examination result:", error);
-    }
-  }
+  //     console.log("Feedback dan Examination Results berhasil dihapus.");
+  //   } catch (error) {
+  //     console.error("Error menghapus feedback dan examination result:", error);
+  //   }
+  // }
 
   // Fungsi untuk menghapus user
   async function handleDeleteUser() {
     setIsDeleting(true);
     try {
-      await deleteFeedbackAndExaminationResults();
+      // await deleteFeedbackAndExaminationResults();
 
-      const userRef = doc(db, "users", patient.id);
+      const userRef = doc(db, "users", user.id);
       await deleteDoc(userRef);
 
       console.log("User berhasil dihapus.");
@@ -76,10 +80,7 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ patient }) => {
           <h3 className="text-lg font-semibold">Konfirmasi Penghapusan</h3>
           <p className="mt-2 text-sm text-gray-600">Apakah Anda yakin ingin menghapus data ini?</p>
           <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={handleDeleteCancel}
-              className="px-4 py-2 bg-gray-300 text-black rounded-lg"
-            >
+            <button onClick={handleDeleteCancel} className="px-4 py-2 bg-gray-300 text-black rounded-lg">
               Batal
             </button>
             <button
@@ -99,10 +100,7 @@ const ButtonDelete: React.FC<ButtonDeleteProps> = ({ patient }) => {
           <h3 className="text-lg font-semibold text-green-500">Penghapusan Berhasil!</h3>
           <p className="mt-2 text-sm text-gray-600">Data telah berhasil dihapus.</p>
           <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={handleSuccessModalClose}
-              className="px-4 py-2 bg-green-400 hover:bg-green-500 text-white rounded-lg"
-            >
+            <button onClick={handleSuccessModalClose} className="px-4 py-2 bg-green-400 hover:bg-green-500 text-white rounded-lg">
               OK
             </button>
           </div>
