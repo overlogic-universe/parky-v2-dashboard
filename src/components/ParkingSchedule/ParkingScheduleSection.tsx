@@ -112,7 +112,7 @@ export default function ParkingScheduleSection() {
           const filteredData = allData.filter((item) => item.lotName.toLowerCase().includes(search.toLowerCase()));
 
           return (
-            <TabsContent key={day.key} value={day.key}>
+            <TabsContent key={day.key} value={day.key} className="py-5 overflow-x-scroll sm:overflow-x-hidden rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
               {/* Search Input */}
               <SearchInput placeholder="Cari berdasarkan nama tempat parkir..." value={search} onChange={setSearch} />
 
