@@ -77,6 +77,11 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
+    icon: <CalenderIcon />,
+    name: "Schedule",
+    path: "/schedule"
+  },
+  {
     icon: <TableIcon />,
     name: "Tabel",
     subItems: [

@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table"
 import Button from "../ui/button/Button";
 import DeleteButton from "./DeleteButton";
 import { useNavigate } from "react-router";
+import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 
 export interface Student {
   id: string;
@@ -95,9 +96,7 @@ export default function StudentTable() {
 
       {/* Loading */}
       {loading ? (
-        <div className="text-center text-gray-500">
-          <div className="animate-spin h-6 w-6 border-t-2 border-brand-500 rounded-full mx-auto"></div>
-        </div>
+        <LoadingAnimation />
       ) : filteredStudents.length > 0 ? (
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
