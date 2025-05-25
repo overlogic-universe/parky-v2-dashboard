@@ -6,7 +6,7 @@ export default function ParkingSchedulePage() {
   return (
     <>
       <PageMeta title="Parky | Schedule 📅" description="Parking Schedule Parky" />
-      <PageBreadcrumb pageTitle="Parking Schedule 📅" />
+      <PageBreadcrumb pageTitle="Jadwal Parkir 📅" />
       <div className="space-y-6">
         <ParkingScheduleSection />
       </div>

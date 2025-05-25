@@ -10,6 +10,7 @@ import { ParkingActivity, ParkingAssignment, ParkingAttendant, ParkingHistory, P
 import SearchInput from "../ui/search";
 import InformationBox from "./InformationBox";
 import { BoxCubeIcon, UserIcon } from "../../icons";
+import { TodayDate } from "../ui/text/TodayDate";
 
 interface ActivityItem {
   studentName: string;
@@ -97,10 +98,12 @@ export default function ParkingActivitySection() {
           const assignment = todayAssignments.find((a) => a.parking_lot_id === lotId);
           const attendant = parkingAttendants.find((att) => att.id === assignment?.parking_attendant_id);
 
-          // Ambil aktivitas parkir untuk tempat parkir ini
           const activitiesForLot = parkingActivities.filter((activity) => activity.parking_lot_id === lotId && activity.created_at.seconds >= startTimestamp.seconds);
 
-          // Siapkan data aktivitas
+          const latestActivity = activitiesForLot.sort((a, b) => b.updated_at.seconds - a.updated_at.seconds)[0];
+
+          const vehicleInCount = latestActivity?.vehicle_in_count || 0;
+
           const activities: ActivityItem[] = activitiesForLot.map((activity) => {
             const history = parkingHistories.find((h) => h.id === activity.parking_history_id);
             const student = students.find((s) => s.id === activity.student_id);
@@ -123,7 +126,7 @@ export default function ParkingActivitySection() {
           return {
             lotId,
             lotName: lot?.name || "-",
-            vehicleInCount: lot?.vehicle_in_count || 0,
+            vehicleInCount,
             maxCapacity: lot?.max_capacity || 0,
             attendantName: attendant?.name || "-",
             activities,
@@ -143,6 +146,7 @@ export default function ParkingActivitySection() {
 
   return (
     <div className="w-full">
+      <TodayDate/>
       {loading ? (
         <LoadingAnimation />
       ) : (
@@ -181,12 +185,12 @@ export default function ParkingActivitySection() {
                       <TableBody>
                         {filteredActivities.map((activity, index) => (
                           <TableRow key={index} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-900" : ""} hover:bg-gray-100 dark:hover:bg-gray-800`}>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.studentName}</TableCell>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.nim}</TableCell>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.vehiclePlate}</TableCell>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.parkedAt}</TableCell>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.exitedAt}</TableCell>
-                            <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{activity.status}</TableCell>
+                            <TableCell className="py-4 text-theme-sm text-gray-800 dark:text-white/90">{activity.studentName}</TableCell>
+                            <TableCell className="py-4 text-theme-sm text-gray-800 dark:text-white/90">{activity.nim}</TableCell>
+                            <TableCell className="py-4 text-theme-sm text-gray-800 dark:text-white/90">{activity.vehiclePlate}</TableCell>
+                            <TableCell className={`py-4 text-theme-sm ${activity.parkedAt == "-" ? "text-gray-800 dark:text-white/90" : "text-green-500 "}`}>{activity.parkedAt}</TableCell>
+                            <TableCell className={`py-4 text-theme-sm  ${activity.exitedAt == "-" ? "text-gray-800 dark:text-white/90" : "text-red-400 "}`}>{activity.exitedAt}</TableCell>
+                            <TableCell className={`py-4 text-theme-sm font-semibold ${activity.status == "in" ? "text-green-500" : "text-red-400"}`}>{activity.status}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

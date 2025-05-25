@@ -81,7 +81,6 @@ export default function CreateParkingLotForm() {
       const parkingLotData = {
         id: parkingLotId,
         name,
-        vehicle_in_count: 0,
         max_capacity: parseInt(maxCapacity, 10),
         latitude: location.lat,
         longitude: location.lng,
@@ -108,8 +107,10 @@ export default function CreateParkingLotForm() {
           updated_at: now,
         });
         if (attendantId) {
-          await addDoc(collection(db, "parking_assignments"), {
-            id: uuidv4(),
+          const parkingAssignmentsId = uuidv4();
+
+          await setDoc(doc(db, "parking_assignments", parkingAssignmentsId), {
+            id: parkingAssignmentsId,
             parking_lot_id: parkingLotId,
             parking_schedule_id: scheduleId,
             parking_attendant_id: attendantId,

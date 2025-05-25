@@ -6,7 +6,7 @@ export default function ParkingActivityPage() {
   return (
     <>
       <PageMeta title="Parky | Activity 🏍️" description="Parking Activity Parky" />
-      <PageBreadcrumb pageTitle="Parking Activity 🏍️" />
+      <PageBreadcrumb pageTitle="Aktivitas Parkir 🏍️" />
       <div className="space-y-6">
         <ParkingActivitySection />
       </div>
