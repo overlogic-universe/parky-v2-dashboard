@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../configuration";
+import { auth, db } from "../../configuration";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import Alert from "../ui/alert/Alert";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ export default function SignInForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleLoginWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -31,7 +33,18 @@ export default function SignInForm() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+
+      // Cek apakah user ada di koleksi admins
+      const userDoc = await getDoc(doc(db, "admins", uid));
+      if (!userDoc.exists()) {
+        // Jika tidak ada, logout dan beri alert
+        await auth.signOut();
+        setShowLoginErrorAlert("Akun tidak terdaftar sebagai admin!");
+        return;
+      }
+
       setShowLoginErrorAlert("");
       navigate("/");
     } catch (err: unknown) {
