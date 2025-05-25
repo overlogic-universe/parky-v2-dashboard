@@ -50,7 +50,7 @@ export default function CreateParkingStudentForm() {
       setLoading(true);
 
       // 🔐 Auto generate password
-      const generatedPassword = generateRandomPassword(); // ambil 12 karakter biar nggak kepanjangan
+      const generatedPassword = generateRandomPassword();
 
       const response = await fetch("http://localhost:5000/send-email", {
         method: "POST",
@@ -76,7 +76,7 @@ export default function CreateParkingStudentForm() {
 
       await setDoc(doc(db, "students", studentId), {
         id: studentId,
-        qr_code_id: uuidv4(), // ← Generate QR ID (bisa ganti pakai logic kamu)
+        qr_code_id: uuidv4(),
         name,
         nim,
         email,

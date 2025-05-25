@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 import DatePicker from "react-datepicker";
 import { db } from "../../configuration";
-import { doc, setDoc, collection, addDoc } from "firebase/firestore";
+import { doc, setDoc, collection, addDoc, getDocs } from "firebase/firestore";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import "leaflet/dist/leaflet.css";
 import { format, toZonedTime } from "date-fns-tz";
 import { useNavigate } from "react-router";
+import { AttendantDropdown } from "./AttendantDropdown";
 
 const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const dayLabels: Record<string, string> = {
@@ -34,6 +35,21 @@ export default function CreateParkingLotForm() {
   const [isActive, setIsActive] = useState(true);
   const [inactiveDescription, setInactiveDescription] = useState("");
   const [schedules, setSchedules] = useState<Partial<Record<string, Schedule>>>({});
+  const [attendants, setAttendants] = useState<{ id: string; name: string }[]>([]);
+  const [assignments, setAssignments] = useState<Partial<Record<string, string>>>({});
+
+  useEffect(() => {
+    const fetchAttendants = async () => {
+      const snapshot = await getDocs(collection(db, "parking_attendants"));
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setAttendants(data);
+    };
+    fetchAttendants();
+  }, []);
+
   const [location, setLocation] = useState({
     lat: -7.5527367,
     lng: 110.7644429,
@@ -55,52 +71,61 @@ export default function CreateParkingLotForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    try {
+      const now = new Date();
 
-    const parkingLotId = uuidv4();
-    console.log("Raw maxCapacity:", maxCapacity);
-    console.log("Parsed maxCapacity:", parseInt(maxCapacity, 10));
+      const parkingLotId = uuidv4();
+      console.log("Raw maxCapacity:", maxCapacity);
+      console.log("Parsed maxCapacity:", parseInt(maxCapacity, 10));
 
-    const parkingLotData = {
-      id: parkingLotId,
-      name,
-      vehicle_in_count: 0,
-      max_capacity: parseInt(maxCapacity, 10),
-      latitude: location.lat,
-      longitude: location.lng,
-      is_active: isActive,
-      inactive_description: isActive ? null : inactiveDescription,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
+      const parkingLotData = {
+        id: parkingLotId,
+        name,
+        vehicle_in_count: 0,
+        max_capacity: parseInt(maxCapacity, 10),
+        latitude: location.lat,
+        longitude: location.lng,
+        is_active: isActive,
+        inactive_description: isActive ? null : inactiveDescription,
+        created_at: now,
+        updated_at: now,
+      };
 
-    await setDoc(doc(db, "parking_lots", parkingLotId), parkingLotData);
+      await setDoc(doc(db, "parking_lots", parkingLotId), parkingLotData);
 
-    for (const day of Object.keys(schedules)) {
-      const schedule = schedules[day]!;
-      const scheduleId = uuidv4();
+      for (const day of Object.keys(schedules)) {
+        const schedule = schedules[day]!;
+        const scheduleId = uuidv4();
+        const attendantId = assignments[day];
 
-      await setDoc(doc(db, "parking_schedules", scheduleId), {
-        id: scheduleId,
-        day_of_week: day,
-        open_time: schedule.open_time ? format(schedule.open_time, "HH:mm") : null,
-        closed_time: schedule.closed_time ? format(schedule.closed_time, "HH:mm") : null,
-        is_closed: schedule.is_closed,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+        await setDoc(doc(db, "parking_schedules", scheduleId), {
+          id: scheduleId,
+          day_of_week: day,
+          open_time: schedule.open_time ? format(schedule.open_time, "HH:mm") : null,
+          closed_time: schedule.closed_time ? format(schedule.closed_time, "HH:mm") : null,
+          is_closed: schedule.is_closed,
+          created_at: now,
+          updated_at: now,
+        });
+        if (attendantId) {
+          await addDoc(collection(db, "parking_assignments"), {
+            id: uuidv4(),
+            parking_lot_id: parkingLotId,
+            parking_schedule_id: scheduleId,
+            parking_attendant_id: attendantId,
+            created_at: now,
+            updated_at: now,
+          });
+        }
+      }
 
-      await addDoc(collection(db, "parking_lots_has_parking_schedules"), {
-        id: uuidv4(),
-        parking_lot_id: parkingLotId,
-        parking_schedule_id: scheduleId,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      setLoading(false);
+      navigate("/");
+      alert("Tempat parkir berhasil ditambahkan!");
+    } catch (e) {
+      setLoading(false);
+      alert(`Gagal Menambahkan Data ${e}`);
     }
-
-    setLoading(false);
-    navigate("/");
-    alert("Tempat parkir berhasil ditambahkan!");
   };
 
   return (
@@ -124,7 +149,7 @@ export default function CreateParkingLotForm() {
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Jadwal Buka (Opsional)</h3>
+        <Label className="text-xl font-semibold text-gray-800 mb-4">Jadwal Operasional</Label>
         <div className="space-y-4">
           {daysOfWeek.map((day) => (
             <div key={day} className="border p-5 rounded-xl bg-white shadow-sm space-y-4">
@@ -148,7 +173,7 @@ export default function CreateParkingLotForm() {
                   placeholderText="Jam Buka"
                   calendarClassName="react-datepicker"
                   popperClassName="react-datepicker-popper"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full z-10 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
                 />
 
                 {/* Jam Tutup */}
@@ -169,7 +194,7 @@ export default function CreateParkingLotForm() {
                   placeholderText="Jam Tutup"
                   calendarClassName="react-datepicker"
                   popperClassName="react-datepicker-popper"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  className=" w-full z-50 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
                 />
 
                 {/* Toggle Tutup */}
@@ -191,6 +216,19 @@ export default function CreateParkingLotForm() {
                     <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-full transition-transform duration-300"></div>
                   </Label>
                 </div>
+              </div>
+              <div>
+                <Label className="font-semibold capitalize text-lg text-gray-800">Petugas Parkir</Label>
+                <AttendantDropdown
+                  selectedId={assignments[day]}
+                  onSelect={(id) =>
+                    setAssignments((prev) => ({
+                      ...prev,
+                      [day]: id,
+                    }))
+                  }
+                  attendants={attendants}
+                />
               </div>
             </div>
           ))}

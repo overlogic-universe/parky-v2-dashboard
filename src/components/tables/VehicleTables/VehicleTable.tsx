@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../configuration";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "../../ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "../../ui/table";
 import Button from "../../ui/button/Button";
 import DeleteButton from "./DeleteButton";
 import { useNavigate } from "react-router";
+import { LoadingAnimation } from "../../ui/loading/LoadingAnimation";
 
 export interface Vehicle {
   id: string;
@@ -60,9 +55,7 @@ export default function VehicleTable() {
     fetchData();
   }, []);
 
-  const filteredvehicles = vehicles.filter((vehicle) =>
-    vehicle.plate.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredvehicles = vehicles.filter((vehicle) => vehicle.plate.toLowerCase().includes(search.toLowerCase()));
 
   const handleDetail = (vehicleId: string) => {
     console.log("Detail vehicle", vehicleId);
@@ -95,58 +88,34 @@ export default function VehicleTable() {
 
       {/* Loading */}
       {loading ? (
-        <div className="text-center text-gray-500">
-          <div className="animate-spin h-6 w-6 border-t-2 border-brand-500 rounded-full mx-auto"></div>
-        </div>
+        <LoadingAnimation />
       ) : filteredvehicles.length > 0 ? (
         <Table>
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Plat Nomor
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Pengendara
               </TableCell>
-              <TableCell
-                isHeader
-                className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Action
               </TableCell>
             </TableRow>
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {filteredvehicles.map((vehicle, index) => (
-              <TableRow
-                key={vehicle.id}
-                className={`py-5 ${
-                  index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""
-                } hover:bg-gray-100 dark:hover:bg-gray-600`}
-              >
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {vehicle.plate}
-                </TableCell>
-                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                  {vehicle.user_id}
-                </TableCell>
+              <TableRow key={vehicle.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""} hover:bg-gray-100 dark:hover:bg-gray-600`}>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{vehicle.plate}</TableCell>
+                <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{vehicle.user_id}</TableCell>
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">
                     {/* <Button size="sm" variant="primary" onClick={() => navigate("/vehicle-detail", { state: { patient: patient } })}> */}
                     <Button size="sm" variant="primary">
                       Detail
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => alert(`Edit ${vehicle.plate}`)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => alert(`Edit ${vehicle.plate}`)}>
                       Edit
                     </Button>
                     <DeleteButton vehicle={vehicle} />
@@ -157,9 +126,7 @@ export default function VehicleTable() {
           </TableBody>
         </Table>
       ) : (
-        <div className="text-center text-theme-sm text-gray-500 pt-5">
-          Kendaraan tidak ditemukan
-        </div>
+        <div className="text-center text-theme-sm text-gray-500 pt-5">Kendaraan tidak ditemukan</div>
       )}
     </div>
   );
