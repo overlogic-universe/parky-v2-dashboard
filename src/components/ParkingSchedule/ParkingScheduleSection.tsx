@@ -141,7 +141,7 @@ export default function ParkingScheduleSection() {
                   </TableBody>
                 </Table>
               ) : (
-                <div className="text-center text-gray-500 py-4">Tidak ada jadwal yang cocok.</div>
+                <div className="text-center text-gray-500 text-theme-sm py-4">Tidak ada jadwal yang cocok</div>
               )}
             </TabsContent>
           );

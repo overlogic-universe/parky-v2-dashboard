@@ -77,6 +77,11 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
+    icon: <PieChartIcon />,
+    name: "Aktivitas Parkir",
+    path: "/activity",
+  },
+  {
     icon: <CalenderIcon />,
     name: "Jadwal",
     path: "/schedule",

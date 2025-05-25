@@ -28,6 +28,7 @@ import CreateParkingLotPage from "./pages/CreateParkingLotPage/CreateParkingLotP
 import ParkingLotTable from "./components/tables/ParkingLotTable";
 import ParkingLotTablePage from "./pages/Tables/ParkingLotTablePage";
 import ParkingSchedulePage from "./pages/ParkingSchedulePage/ParkingSchedulePage";
+import ParkingActivityPage from "./pages/ParkingActivityPage/ParkingActivityPage";
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
             }
           >
             <Route index path="/" element={<DashboardPage />} />
+            <Route index path="/activity" element={<ParkingActivityPage />} />
             <Route index path="/schedule" element={<ParkingSchedulePage />} />
             <Route index path="/student-table" element={<StudentTablePage />} />
             <Route index path="/parking-attendant-table" element={<ParkingAttendantTablePage />} />

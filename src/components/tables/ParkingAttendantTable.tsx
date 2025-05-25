@@ -111,7 +111,7 @@ export default function ParkingAttendant() {
           </TableBody>
         </Table>
       ) : (
-        <div className="text-center text-theme-sm text-gray-500 pt-5">User tidak ditemukan</div>
+        <div className="text-center text-theme-sm text-gray-500 pt-5">Petugas tidak ditemukan</div>
       )}
     </div>
   );

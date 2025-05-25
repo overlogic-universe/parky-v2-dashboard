@@ -136,7 +136,7 @@ export default function StudentTable() {
           </TableBody>
         </Table>
       ) : (
-        <div className="text-center text-theme-sm text-gray-500 pt-5">Student tidak ditemukan</div>
+        <div className="text-center text-theme-sm text-gray-500 pt-5">Mahasiswa tidak ditemukan</div>
       )}
     </div>
   );

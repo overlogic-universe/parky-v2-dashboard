@@ -21,7 +21,6 @@ export interface ParkingActivity {
   student_id: string;
   parking_history_id: string;
   parking_lot_id: string;
-  parking_attendant_id: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
 }
