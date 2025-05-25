@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table"
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
+import SearchInput from "../ui/search";
 
 type ParkingLot = {
   id: string;
@@ -92,9 +93,7 @@ export default function ParkingLotTable() {
 
   return (
     <div className="py-5 rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="p-4">
-        <Input placeholder="Cari berdasarkan nama tempat parkir..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full max-w-md mb-4" />
-      </div>
+      <SearchInput placeholder="Cari berdasarkan nama tempat parkir..." value={searchTerm} onChange={(e) => setSearchTerm(e)} />
       {loading ? (
         <LoadingAnimation />
       ) : filteredLots.length === 0 ? (
@@ -104,16 +103,26 @@ export default function ParkingLotTable() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>Nama</TableCell>
-                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>Kapasitas Maksimal</TableCell>
-                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>Lokasi</TableCell>
-                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>Jadwal</TableCell>
-                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>Aksi</TableCell>
+                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>
+                  Nama
+                </TableCell>
+                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>
+                  Kapasitas Maksimal
+                </TableCell>
+                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>
+                  Lokasi
+                </TableCell>
+                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>
+                  Jadwal
+                </TableCell>
+                <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400" isHeader>
+                  Aksi
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {filteredLots.map((lot, index) => (
-                <TableRow key={lot.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""} hover:bg-gray-100 dark:hover:bg-gray-600`}>
+                <TableRow key={lot.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-900" : ""} hover:bg-gray-100 dark:hover:bg-gray-800`}>
                   <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{lot.name}</TableCell>
                   <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{lot.max_capacity}</TableCell>
                   <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90 space-y-2">

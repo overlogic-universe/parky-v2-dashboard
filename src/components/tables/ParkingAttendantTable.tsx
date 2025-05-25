@@ -6,6 +6,8 @@ import Button from "../ui/button/Button";
 import DeleteButton from "./DeleteButton";
 import { useNavigate } from "react-router";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
+import Input from "../form/input/InputField";
+import SearchInput from "../ui/search";
 
 export interface User {
   id: string;
@@ -67,15 +69,7 @@ export default function ParkingAttendant() {
   return (
     <div className="py-5 overflow-x-scroll sm:overflow-x-hidden rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       {/* Search Input */}
-      <div className="flex gap-3 mb-4 px-5">
-        <input
-          type="text"
-          placeholder="Cari berdasarkan nama..."
-          className="border border-gray-300 dark:bg-gray-800 p-2 text-gray-500 text-start text-theme-sm dark:text-gray-400 rounded-md flex-grow"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+      <SearchInput placeholder="Cari berdasarkan nama petugas..." value={search} onChange={(e) => setSearch(e)} />
 
       {/* Loading */}
       {loading ? (
@@ -97,7 +91,7 @@ export default function ParkingAttendant() {
           </TableHeader>
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {filteredUsers.map((user, index) => (
-              <TableRow key={user.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""} hover:bg-gray-100 dark:hover:bg-gray-600`}>
+              <TableRow key={user.id} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-900" : ""} hover:bg-gray-100 dark:hover:bg-gray-800`}>
                 <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{user.name}</TableCell>
                 <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{user.email}</TableCell>
                 <TableCell className="flex gap-2 py-2">

@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tab/Tab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tab";
 import { ParkingAssignment, ParkingAttendant, ParkingLot, ParkingSchedule } from "../../interface/interface";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
+import SearchInput from "../ui/search";
 
 const DAYS = [
   { key: "monday", label: "Senin" },
@@ -28,6 +29,7 @@ interface ScheduleItem {
 export default function ParkingScheduleSection() {
   const [dataByDay, setDataByDay] = useState<Record<string, ScheduleItem[]>>({});
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     console.log(`Jalannnn`);
@@ -104,36 +106,46 @@ export default function ParkingScheduleSection() {
           ))}
         </TabsList>
 
-        {DAYS.map((day) => (
-          <TabsContent key={day.key} value={day.key}>
-            {loading ? (
-              <LoadingAnimation />
-            ) : dataByDay[day.key]?.length > 0 ? (
-              <Table>
-                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                  <TableRow>
-                    <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tempat Parkir</TableCell>
-                    <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Buka</TableCell>
-                    <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tutup</TableCell>
-                    <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Petugas</TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {dataByDay[day.key].map((item, idx) => (
-                    <TableRow key={idx} className={`py-5 ${idx % 2 !== 1 ? "bg-gray-200 dark:bg-gray-700" : ""} hover:bg-gray-100 dark:hover:bg-gray-600`}>
-                      <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.lotName}</TableCell>
-                      <TableCell className="py-4 text-green-500 text-theme-sm ">{item.openTime}</TableCell>
-                      <TableCell className="py-4 text-red-400 text-theme-sm ">{item.closedTime}</TableCell>
-                      <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.attendantName}</TableCell>
+        {DAYS.map((day) => {
+          const allData = dataByDay[day.key] || [];
+
+          const filteredData = allData.filter((item) => item.lotName.toLowerCase().includes(search.toLowerCase()));
+
+          return (
+            <TabsContent key={day.key} value={day.key}>
+              {/* Search Input */}
+              <SearchInput placeholder="Cari berdasarkan nama tempat parkir..." value={search} onChange={setSearch} />
+
+              {/* Loading */}
+              {loading ? (
+                <LoadingAnimation />
+              ) : filteredData.length > 0 ? (
+                <Table>
+                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                    <TableRow>
+                      <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tempat Parkir</TableCell>
+                      <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Buka</TableCell>
+                      <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Tutup</TableCell>
+                      <TableCell className="ps-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">Petugas</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center text-gray-500 py-4">Tidak ada jadwal untuk hari ini.</div>
-            )}
-          </TabsContent>
-        ))}
+                  </TableHeader>
+                  <TableBody>
+                    {filteredData.map((item, index) => (
+                      <TableRow key={index} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-900" : ""} hover:bg-gray-100 dark:hover:bg-gray-800`}>
+                        <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.lotName}</TableCell>
+                        <TableCell className="py-4 text-green-500 text-theme-sm">{item.openTime}</TableCell>
+                        <TableCell className="py-4 text-red-400 text-theme-sm">{item.closedTime}</TableCell>
+                        <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.attendantName}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center text-gray-500 py-4">Tidak ada jadwal yang cocok.</div>
+              )}
+            </TabsContent>
+          );
+        })}
       </Tabs>
     </div>
   );
