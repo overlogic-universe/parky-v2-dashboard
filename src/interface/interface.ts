@@ -21,6 +21,7 @@ export interface ParkingActivity {
   student_id: string;
   parking_history_id: string;
   parking_lot_id: string;
+  vehicle_in_count: number;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
 }
@@ -38,7 +39,6 @@ export interface ParkingAttendant {
 export interface ParkingLot {
   id: string;
   name: string;
-  vehicle_in_count: number;
   max_capacity: number;
   latitude: number;
   longitude: number;
