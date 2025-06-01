@@ -1,34 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SignIn from "./pages/AuthPages/SignIn";
 import NotFound from "./pages/OtherPage/NotFound";
-import UserProfiles from "./pages/UserProfiles";
-import Videos from "./pages/UiElements/Videos";
-import Images from "./pages/UiElements/Images";
-import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
-import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import OnlyGuestRoute from "./layout/OnlyGuestRoute";
 import PrivateRoute from "./layout/PrivateRoute";
-import VehicleTable from "./components/tables/VehicleTables/VehicleTable";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import CreateParkingAttendantPage from "./pages/CreateParkingAttendantPage.tsx/CreateParkingAttendantPage";
 import CreateStudentPage from "./pages/CreateStudentPage/CreateStudentPage";
 import ParkingAttendantTablePage from "./pages/Tables/ParkingAttendantTablePage";
 import StudentTablePage from "./pages/Tables/StudentTablePage";
 import CreateParkingLotPage from "./pages/CreateParkingLotPage/CreateParkingLotPage";
-import ParkingLotTable from "./components/tables/ParkingLotTable";
 import ParkingLotTablePage from "./pages/Tables/ParkingLotTablePage";
 import ParkingSchedulePage from "./pages/ParkingSchedulePage/ParkingSchedulePage";
 import ParkingActivityPage from "./pages/ParkingActivityPage/ParkingActivityPage";
+import ParkingActivityTodayPage from "./pages/ParkingActivityPage/ParkingActivityTodayPage";
 
 export default function App() {
   return (
@@ -56,6 +42,7 @@ export default function App() {
           >
             <Route index path="/" element={<DashboardPage />} />
             <Route index path="/activity" element={<ParkingActivityPage />} />
+            <Route index path="/activity-today" element={<ParkingActivityTodayPage />} />
             <Route index path="/schedule" element={<ParkingSchedulePage />} />
             <Route index path="/student-table" element={<StudentTablePage />} />
             <Route index path="/parking-attendant-table" element={<ParkingAttendantTablePage />} />

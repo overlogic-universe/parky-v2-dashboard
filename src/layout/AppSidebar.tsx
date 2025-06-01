@@ -79,7 +79,10 @@ const navItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Aktivitas Parkir",
-    path: "/activity",
+    subItems: [
+      { name: "Hari Ini", path: "/activity-today", pro: false },
+      { name: "Mingguan", path: "/activity", pro: false },
+    ],
   },
   {
     icon: <CalenderIcon />,

@@ -5,19 +5,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tab";
-import { ParkingAssignment, ParkingAttendant, ParkingLot, ParkingSchedule } from "../../interface/interface";
+import {  ParkingAssignment, ParkingAttendant, ParkingLot, ParkingSchedule } from "../../interface/interface";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import SearchInput from "../ui/search";
-
-const DAYS = [
-  { key: "monday", label: "Senin" },
-  { key: "tuesday", label: "Selasa" },
-  { key: "wednesday", label: "Rabu" },
-  { key: "thursday", label: "Kamis" },
-  { key: "friday", label: "Jumat" },
-  { key: "saturday", label: "Sabtu" },
-  { key: "sunday", label: "Minggu" },
-];
+import { DAYS, translateDayToIndo } from "../../utils/DayUtil";
 
 interface ScheduleItem {
   lotName: string;
@@ -60,7 +51,7 @@ export default function ParkingScheduleSection() {
         const groupedData: Record<string, ScheduleItem[]> = {};
 
         for (const day of DAYS) {
-          const schedulesForDay = schedules.filter((s) => s.day_of_week === day.key);
+          const schedulesForDay = schedules.filter((s) => s.day_of_week === day);
           const items: ScheduleItem[] = [];
 
           for (const schedule of schedulesForDay) {
@@ -82,7 +73,7 @@ export default function ParkingScheduleSection() {
             }
           }
 
-          groupedData[day.key] = items;
+          groupedData[day] = items;
         }
         setDataByDay(groupedData);
       } catch (e) {
@@ -98,21 +89,21 @@ export default function ParkingScheduleSection() {
   return (
     <div className="w-full">
       <Tabs defaultValue="monday" className="w-full">
-        <TabsList className="grid grid-cols-7 mb-4">
+        <TabsList className="grid sm:grid-cols-7 grid-cols-3 mb-4">
           {DAYS.map((day) => (
-            <TabsTrigger key={day.key} value={day.key}>
-              {day.label}
+            <TabsTrigger key={day} value={day}>
+              {translateDayToIndo(day)}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {DAYS.map((day) => {
-          const allData = dataByDay[day.key] || [];
+          const allData = dataByDay[day] || [];
 
           const filteredData = allData.filter((item) => item.lotName.toLowerCase().includes(search.toLowerCase()));
 
           return (
-            <TabsContent key={day.key} value={day.key} className="py-5 overflow-x-scroll sm:overflow-x-hidden rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <TabsContent key={day} value={day} className="py-5 overflow-x-scroll sm:overflow-x-hidden rounded-xl border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
               {/* Search Input */}
               <SearchInput placeholder="Cari berdasarkan nama tempat parkir..." value={search} onChange={setSearch} />
 
