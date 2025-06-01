@@ -13,15 +13,22 @@ const TabsContext = createContext<TabsContextProps | null>(null);
 
 export function Tabs({
   defaultValue,
+  onValueChange,
   children,
   className,
 }: {
   defaultValue: string;
+  onValueChange?: (value: string) => void;
   children: ReactNode;
   className?: string;
 }) {
-  const [value, setValue] = useState(defaultValue);
+  const [value, setValueState] = useState(defaultValue);
   const idPrefix = useId();
+
+  const setValue = (newValue: string) => {
+    setValueState(newValue);
+    onValueChange?.(newValue);
+  };
 
   return (
     <TabsContext.Provider value={{ value, setValue, idPrefix }}>
