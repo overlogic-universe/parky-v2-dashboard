@@ -20,14 +20,29 @@ export default function SignInForm() {
   const handleLoginWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!email?.trim() && !password?.trim()) {
+      setShowLoginErrorAlert("Email dan kata sandi tidak boleh kosong!");
+      return;
+    }
+
+    if (!email?.trim()) {
+      setShowLoginErrorAlert("Email tidak boleh kosong!");
+      return;
+    }
+    
+    if (!password?.trim()) {
+      setShowLoginErrorAlert("Kata sandi tidak boleh kosong!");
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setShowLoginErrorAlert("Email tidak valid. Contoh: johndoe@gmail.com.");
       return;
     }
 
-    if (password.length < 8) {
-      setShowLoginErrorAlert("Password minimal 8 karakter!");
+    if (password.length < 6) {
+      setShowLoginErrorAlert("Password minimal 6 karakter!");
       return;
     }
 
@@ -48,7 +63,7 @@ export default function SignInForm() {
       setShowLoginErrorAlert("");
       navigate("/");
     } catch (err: unknown) {
-      setShowLoginErrorAlert("Login gagal. Harap coba lagi!");
+      setShowLoginErrorAlert("Login gagal. Email atau kata sandi salah!");
     } finally {
       setLoading(false);
     }
