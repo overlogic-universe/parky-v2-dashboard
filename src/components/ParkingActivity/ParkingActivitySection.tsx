@@ -9,7 +9,7 @@ import { ParkingActivity, ParkingAssignment, ParkingAttendant, ParkingHistory, P
 import SearchInput from "../ui/search";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import { DAYS, translateDayToIndo } from "../../utils/DayUtil";
-import { formatDateWithTime, formatFullIndoDateTime } from "../../utils/DateUtil";
+import { formatFullIndoDateTime } from "../../utils/DateUtil";
 
 interface ActivityItem {
   studentName: string;

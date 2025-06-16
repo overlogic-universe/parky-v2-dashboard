@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Alert from "../ui/alert/Alert";
-import { createUserWithEmailAndPassword, updatePassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../configuration";
 import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid"; // Tambahkan jika pakai UUID
