@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import SearchInput from "../ui/search";
+import DeleteButton from "./DeleteButton";
 
 type ParkingLot = {
   id: string;
@@ -37,9 +38,11 @@ export default function ParkingLotTable() {
     async function fetchData() {
       setLoading(true);
 
-      const lotsSnapshot = await getDocs(collection(db, "parking_lots"));
+      const lotsQuery = query(collection(db, "parking_lots"), where("deleted_at", "==", null));
+      const lotsSnapshot = await getDocs(lotsQuery);
       const scheduleSnapshot = await getDocs(collection(db, "parking_schedules"));
-      const linkSnapshot = await getDocs(collection(db, "parking_assignments"));
+      const linkQuery = query(collection(db, "parking_assignments"), where("deleted_at", "==", null));
+      const linkSnapshot = await getDocs(linkQuery);
 
       const scheduleMap = new Map<string, Schedule>();
       scheduleSnapshot.forEach((doc) => {
@@ -132,33 +135,32 @@ export default function ParkingLotTable() {
                   </TableCell>
                   <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">
                     <div className="space-y-2">
-                      {lot.schedules
-                        .sort((a, b) => daysOrder[a.day_of_week] - daysOrder[b.day_of_week])
-                        .map((schedule, index) => (
-                          <div key={index} className="flex items-start">
-                            <span className="min-w-[60px] font-medium">{dayLabels[schedule.day_of_week]}:</span>
-                            {schedule.is_closed ? (
-                              <span className="border border-red-500 text-red-600 px-2 py-1 rounded text-xs">Tutup ({schedule.inactive_desc ?? "-"})</span>
-                            ) : (
-                              <span className="border border-green-500 text-green-700 px-2 py-1 rounded text-xs">
-                                {schedule.open_time} - {schedule.closed_time}
-                              </span>
-                            )}
-                          </div>
-                        ))}
+                      {lot.schedules.length === 0 ? (
+                        <div className="text-gray-500 text-sm italic">Belum dijadwalkan</div>
+                      ) : (
+                        lot.schedules
+                          .sort((a, b) => daysOrder[a.day_of_week] - daysOrder[b.day_of_week])
+                          .map((schedule, index) => (
+                            <div key={index} className="flex items-start">
+                              <span className="min-w-[60px] font-medium">{dayLabels[schedule.day_of_week]}:</span>
+                              {schedule.is_closed ? (
+                                <span className="border border-red-500 text-red-600 px-2 py-1 rounded text-xs">Tutup ({schedule.inactive_desc ?? "-"})</span>
+                              ) : (
+                                <span className="border border-green-500 text-green-700 px-2 py-1 rounded text-xs">
+                                  {schedule.open_time} - {schedule.closed_time} WIB
+                                </span>
+                              )}
+                            </div>
+                          ))
+                      )}
                     </div>
                   </TableCell>
 
                   <TableCell className="space-x-2 py-4 text-gray-800 text-theme-sm dark:text-white/90">
                     <Button size="sm" variant="primary">
-                      Detail
-                    </Button>
-                    <Button size="sm" variant="outline">
                       Edit
                     </Button>
-                    <Button size="sm" className="bg-red-400 hover:bg-red-500">
-                      Hapus
-                    </Button>
+                    <DeleteButton data={lot} collectionName="parking_lots" />
                   </TableCell>
                 </TableRow>
               ))}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import Button from "../ui/button/Button";
@@ -27,9 +27,9 @@ export default function StudentTable() {
     async function fetchData() {
       setLoading(true);
       try {
-        const studentSnapshot = await getDocs(collection(db, "students"));
-        console.log(`STUDENT ${studentSnapshot}}`);
-        const studentsData = studentSnapshot.docs.map((doc) => ({
+        const studentsQuery = query(collection(db, "students"), where("deleted_at", "==", null));
+        const studentsSnapshot = await getDocs(studentsQuery);
+        const studentsData = studentsSnapshot.docs.map((doc) => ({
           id: doc.id,
           name: doc.data().name,
           email: doc.data().email,
@@ -62,25 +62,10 @@ export default function StudentTable() {
 
   const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(search.toLowerCase()));
 
-  const handleDetail = (studentId: string) => {
-    console.log("Detail student", studentId);
-    // TODO: navigasi ke halaman detail student
-    navigate(`/students/${studentId}`);
-  };
-
-  const handleAdd = () => {
-    console.log("Add student");
-    // TODO: navigasi atau buka modal tambah
-  };
 
   const handleEdit = (studentId: string) => {
     console.log("Edit student", studentId);
     // TODO: navigasi atau buka modal edit
-  };
-
-  const handleDelete = (studentId: string) => {
-    console.log("Delete student", studentId);
-    // TODO: tampilkan konfirmasi & hapus dari Firestore
   };
 
   return (
@@ -122,13 +107,10 @@ export default function StudentTable() {
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">
                     {/* <Button size="sm" variant="primary" onClick={() => navigate("/student-detail", { state: { patient: patient } })}> */}
-                    <Button size="sm" variant="primary">
-                      Detail
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => alert(`Edit ${student.name}`)}>
+                    <Button size="sm" variant="primary" onClick={() => alert(`Edit ${student.name}`)}>
                       Edit
                     </Button>
-                    <DeleteButton user={student} />
+                    <DeleteButton data={student} collectionName="students" />
                   </div>
                 </TableCell>
               </TableRow>

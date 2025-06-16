@@ -29,7 +29,7 @@ export default function SignInForm() {
       setShowLoginErrorAlert("Email tidak boleh kosong!");
       return;
     }
-    
+
     if (!password?.trim()) {
       setShowLoginErrorAlert("Kata sandi tidak boleh kosong!");
       return;
@@ -51,12 +51,21 @@ export default function SignInForm() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
 
-      // Cek apakah user ada di koleksi admins
+      // Ambil data admin dari Firestore
       const userDoc = await getDoc(doc(db, "admins", uid));
+
       if (!userDoc.exists()) {
-        // Jika tidak ada, logout dan beri alert
         await auth.signOut();
         setShowLoginErrorAlert("Akun tidak terdaftar sebagai admin!");
+        return;
+      }
+
+      const adminData = userDoc.data();
+
+      // Cek apakah admin sudah dihapus (soft delete)
+      if (adminData.deleted_at !== null && adminData.deleted_at !== undefined) {
+        await auth.signOut();
+        setShowLoginErrorAlert("Login gagal. Email atau kata sandi salah!");
         return;
       }
 

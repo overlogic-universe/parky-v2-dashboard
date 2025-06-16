@@ -5,7 +5,7 @@ import Input from "../form/input/InputField";
 import Alert from "../ui/alert/Alert";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../configuration";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { generateRandomPassword } from "../../utils/GetRandomPassword";
 import GeneratedPasswordInformation from "../common/GeneratedPasswordInformation";
 
@@ -35,8 +35,44 @@ export default function CreateParkingAttendantForm() {
     try {
       setLoading(true);
 
-      // 🔐 Auto generate password
-      const generatedPassword = generateRandomPassword(); // ambil 12 karakter biar nggak kepanjangan
+      // Cek apakah email sudah terdaftar di Firestore
+      const attendantsQuery = query(collection(db, "parking_attendants"), where("email", "==", email));
+      const existingAttendantSnapshot = await getDocs(attendantsQuery);
+
+      if (!existingAttendantSnapshot.empty) {
+        const attendantDoc = existingAttendantSnapshot.docs[0];
+        const attendantId = attendantDoc.id;
+
+        // Update nama & aktifkan kembali
+        await updateDoc(doc(db, "parking_attendants", attendantId), {
+          name,
+          updated_at: new Date(),
+          deleted_at: null,
+        });
+
+        // Kirim email untuk hubungi admin
+        const response = await fetch("http://localhost:5000/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            password: "Untuk mendapatkan password, silakan hubungi admin di adminparky@gmail.com",
+            role: "petugas",
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error("Gagal mengirim email notifikasi: " + errorText);
+        }
+
+        navigate("/");
+        return;
+      }
+
+      // Auto generate password
+      const generatedPassword = generateRandomPassword();
 
       // Kirim email ke petugas
       const response = await fetch("http://localhost:5000/send-email", {
@@ -56,16 +92,18 @@ export default function CreateParkingAttendantForm() {
         throw new Error("Gagal mengirim email notifikasi");
       }
 
+      // Buat akun Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, generatedPassword);
       const user = userCredential.user;
 
-      // Simpan data tambahan ke Firestore
+      // Simpan data petugas
       await setDoc(doc(db, "parking_attendants", user.uid), {
         id: user.uid,
         name,
         email,
         created_at: new Date(),
         updated_at: new Date(),
+        deleted_at: null,
       });
 
       navigate("/");
@@ -87,11 +125,8 @@ export default function CreateParkingAttendantForm() {
         case "auth/operation-not-allowed":
           errorMessage = "Pembuatan akun dengan email dan password tidak diizinkan.";
           break;
-        case "Gagal mengirim email notifikasi":
-          errorMessage = "Gagal mengirim email notifikasi.";
-          break;
         default:
-          errorMessage = "Gagal membuat akun. Silakan coba lagi.";
+          errorMessage = error.message || "Gagal membuat akun. Silakan coba lagi.";
           break;
       }
 
