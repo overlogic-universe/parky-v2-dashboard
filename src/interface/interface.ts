@@ -105,3 +105,15 @@ export interface Admin {
   updated_at: FirestoreTimestamp;
   deleted_at: FirestoreTimestamp | null;
 }
+
+
+export const daysOfWeek = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+export const dayLabels: Record<string, string> = {
+  monday: "Senin",
+  tuesday: "Selasa",
+  wednesday: "Rabu",
+  thursday: "Kamis",
+  friday: "Jumat",
+  saturday: "Sabtu",
+  sunday: "Minggu",
+};
