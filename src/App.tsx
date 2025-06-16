@@ -15,6 +15,10 @@ import ParkingLotTablePage from "./pages/Tables/ParkingLotTablePage";
 import ParkingSchedulePage from "./pages/ParkingSchedulePage/ParkingSchedulePage";
 import ParkingActivityPage from "./pages/ParkingActivityPage/ParkingActivityPage";
 import ParkingActivityTodayPage from "./pages/ParkingActivityPage/ParkingActivityTodayPage";
+import UpdateParkingLotPage from "./pages/UpdateParkingLotPage/UpdateParkingLotPage";
+import UpdateStudent from "./pages/UpdateStudentPage/UpdateStudentPage";
+import UpdateStudentPage from "./pages/UpdateStudentPage/UpdateStudentPage";
+import UpdateParkingAttendantPage from "./pages/UpdateParkingAttendantPage/UpdateParkingAttendantPage";
 
 export default function App() {
   return (
@@ -51,6 +55,10 @@ export default function App() {
             <Route index path="/create-parking-attendant" element={<CreateParkingAttendantPage />} />
             <Route index path="/create-student" element={<CreateStudentPage />} />
             <Route index path="/create-parking-lot" element={<CreateParkingLotPage />} />
+
+            <Route path="/update-parking-lot/:parkingLotId" element={<UpdateParkingLotPage />} />
+            <Route path="/update-student/:id" element={<UpdateStudentPage />} />
+            <Route path="/update-parking-attendant/:id" element={<UpdateParkingAttendantPage />} />
             {/* <Route index path="/user-detail" element={<PatientDetailsPage />} />
             <Route path="/userprofiles" element={<UserProfiles />} />
             <Route path="/videos" element={<Videos />} />

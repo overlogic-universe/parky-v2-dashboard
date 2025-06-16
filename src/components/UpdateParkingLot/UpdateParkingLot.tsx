@@ -1,29 +1,40 @@
-import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import { LeafletMouseEvent } from "leaflet";
-import DatePicker from "react-datepicker";
-import { db } from "../../configuration";
-import { doc, setDoc, collection, getDocs, serverTimestamp, getDoc, query, where } from "firebase/firestore";
-import Label from "../form/Label";
-import Input from "../form/input/InputField";
-import "leaflet/dist/leaflet.css";
-import { format, toZonedTime } from "date-fns-tz";
+// ... imports (tetap sama)
+import { collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { useNavigate } from "react-router";
-import { AttendantDropdown } from "./AttendantDropdown";
-import { dayLabels, daysOfWeek, FirestoreTimestamp, ParkingAttendant, ParkingSchedule } from "../../interface/interface";
+import DatePicker from "react-datepicker";
+import { toZonedTime, format } from "date-fns-tz";
+import "react-datepicker/dist/react-datepicker.css";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useState, useEffect } from "react";
+import { db } from "../../configuration";
+import { ParkingAssignment, ParkingSchedule, ParkingAttendant, ParkingLot, FirestoreTimestamp, dayLabels, daysOfWeek } from "../../interface/interface";
+import { UpdateParkingLotFormProps } from "../../pages/UpdateParkingLotPage/UpdateParkingLotPage";
+import Input from "../form/input/InputField";
+import Label from "../form/Label";
 import Alert from "../ui/alert/Alert";
+import { LeafletMouseEvent } from "leaflet";
+import { AttendantDropdown } from "../CreateParkingLot/AttendantDropdown";
 
-export default function CreateParkingLotForm() {
+// ...imports tetap sama
+
+export default function UpdateParkingLotForm({ parkingLotId }: UpdateParkingLotFormProps) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [name, setName] = useState("");
   const [maxCapacity, setMaxCapacity] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [inactiveDescription, setInactiveDescription] = useState("");
+  const [location, setLocation] = useState({ lat: 0, lng: 0 });
+
+  const [assignments, setAssignments] = useState<Partial<Record<string, string>>>({});
   const [schedules, setSchedules] = useState<Partial<Record<string, ParkingSchedule>>>({});
   const [attendants, setAttendants] = useState<ParkingAttendant[]>([]);
-  const [assignments, setAssignments] = useState<Partial<Record<string, string>>>({});
   const [parkingAssignments, setParkingAssignments] = useState<any[]>([]);
-  const [showCreateErrorAlert, setShowCreateErrorAlert] = useState<string | null>(null);
+  const [showUpdateErrorAlert, setShowUpdateErrorAlert] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+  const jakartaTimezone = "Asia/Jakarta";
 
   useEffect(() => {
     const fetchParkingAssignments = async () => {
@@ -49,28 +60,151 @@ export default function CreateParkingLotForm() {
   }, []);
 
   useEffect(() => {
-    const fetchAttendants = async () => {
-      const attendantsQuery = query(collection(db, "parking_attendants"), where("deleted_at", "==", null));
+    const fetchData = async () => {
+      try {
+        const lotSnap = await getDoc(doc(db, "parking_lots", parkingLotId));
+        if (!lotSnap.exists()) throw new Error("Data tempat parkir tidak ditemukan.");
 
-      const snapshot = await getDocs(attendantsQuery);
-      const data: ParkingAttendant[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as ParkingAttendant[];
-      setAttendants(data);
+        const lot = lotSnap.data() as ParkingLot;
+        setName(lot.name);
+        setMaxCapacity(String(lot.max_capacity));
+        setIsActive(lot.is_active);
+        setInactiveDescription(lot.inactive_description || "");
+        setLocation({ lat: lot.latitude, lng: lot.longitude });
+
+        const assignmentSnap = await getDocs(query(collection(db, "parking_assignments"), where("parking_lot_id", "==", parkingLotId), where("deleted_at", "==", null)));
+
+        const assignmentData = assignmentSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as (ParkingAssignment & { id: string })[];
+
+        const assignmentMap: Record<string, string> = {};
+        for (const assignment of assignmentData) {
+          const scheduleSnap = await getDoc(doc(db, "parking_schedules", assignment.parking_schedule_id));
+          if (scheduleSnap.exists()) {
+            const schedule = scheduleSnap.data() as ParkingSchedule;
+            if (!schedule.deleted_at) {
+              assignmentMap[schedule.day_of_week] = assignment.parking_attendant_id;
+            }
+          }
+        }
+        setAssignments(assignmentMap);
+
+        const scheduleDocs = await Promise.all(assignmentData.map((a) => getDoc(doc(db, "parking_schedules", a.parking_schedule_id))));
+
+        const scheduleData = scheduleDocs
+          .filter((doc) => doc.exists() && doc.data().deleted_at)
+          .reduce((acc, doc) => {
+            acc[doc.id] = doc.data() as ParkingSchedule;
+            return acc;
+          }, {} as Record<string, ParkingSchedule>);
+
+        setSchedules(scheduleData); // ✅ Now matches expected type
+
+        const attendantsSnap = await getDocs(query(collection(db, "parking_attendants"), where("deleted_at", "==", null)));
+        setAttendants(attendantsSnap.docs.map((doc) => doc.data() as ParkingAttendant));
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchAttendants();
-  }, []);
+    fetchData();
+  }, [parkingLotId]);
 
-  const [location, setLocation] = useState({
-    lat: -7.5527367,
-    lng: 110.7644429,
-  });
-  const [loading, setLoading] = useState(false);
-  const jakartaTimezone = "Asia/Jakarta";
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateDoc(doc(db, "parking_lots", parkingLotId), {
+        name,
+        max_capacity: Number(maxCapacity),
+        is_active: isActive,
+        inactive_description: isActive ? null : inactiveDescription,
+        latitude: location.lat,
+        longitude: location.lng,
+        updated_at: new Date(),
+      });
 
-  const navigate = useNavigate();
+      // 1. Simpan ParkingSchedule & ParkingAssignment untuk setiap hari
+      for (const day of daysOfWeek) {
+        let schedule = schedules[day];
+        const attendantId = assignments[day];
+
+        if (!schedule) continue;
+
+        // Auto-set is_closed = true if open_time or closed_time is missing
+        const isTimeIncomplete = !schedule.open_time || !schedule.closed_time;
+        schedule = {
+          ...schedule,
+          is_closed: isTimeIncomplete ? true : schedule.is_closed,
+        };
+
+        const q = query(collection(db, "parking_schedules"), where("day_of_week", "==", day), where("deleted_at", "==", null));
+
+        const existing = await getDocs(q);
+        let scheduleId = "";
+
+        if (!existing.empty) {
+          const docRef = existing.docs[0].ref;
+          await updateDoc(docRef, {
+            open_time: schedule.open_time,
+            closed_time: schedule.closed_time,
+            is_closed: schedule.is_closed,
+            updated_at: new Date(),
+          });
+          scheduleId = docRef.id;
+        } else {
+          const newSchedule = doc(collection(db, "parking_schedules"));
+          await updateDoc(newSchedule, {
+            id: newSchedule.id,
+            day_of_week: day,
+            open_time: schedule.open_time,
+            closed_time: schedule.closed_time,
+            is_closed: schedule.is_closed,
+            created_at: new Date(),
+            updated_at: new Date(),
+            deleted_at: null,
+          });
+          scheduleId = newSchedule.id;
+        }
+
+        const assignSnap = await getDocs(query(collection(db, "parking_assignments"), where("parking_lot_id", "==", parkingLotId), where("parking_schedule_id", "==", scheduleId), where("deleted_at", "==", null)));
+
+        if (!attendantId) {
+          for (const docSnap of assignSnap.docs) {
+            await updateDoc(docSnap.ref, {
+              deleted_at: new Date(),
+            });
+          }
+        } else if (!assignSnap.empty) {
+          const ref = assignSnap.docs[0].ref;
+          await updateDoc(ref, {
+            parking_attendant_id: attendantId,
+            updated_at: new Date(),
+          });
+        } else {
+          const newAssignmentRef = doc(collection(db, "parking_assignments"));
+          await updateDoc(newAssignmentRef, {
+            id: newAssignmentRef.id,
+            parking_lot_id: parkingLotId,
+            parking_schedule_id: scheduleId,
+            parking_attendant_id: attendantId,
+            created_at: new Date(),
+            updated_at: new Date(),
+            deleted_at: null,
+          });
+        }
+      }
+
+      alert("Data berhasil diperbarui!");
+      navigate("/parking-lot-table");
+    } catch (err) {
+      alert("Gagal memperbarui data.");
+      console.error(err);
+    }
+  };
 
   function LocationSelector() {
     useMapEvents({
@@ -81,131 +215,14 @@ export default function CreateParkingLotForm() {
     return null;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowCreateErrorAlert(null); // Reset error
-    setLoading(true);
-
-    // Validasi utama
-    if (!name.trim()) {
-      setShowCreateErrorAlert("Nama tempat parkir wajib diisi.");
-      setLoading(false);
-      return;
-    }
-
-    if (!maxCapacity.trim() || isNaN(Number(maxCapacity)) || Number(maxCapacity) <= 0) {
-      setShowCreateErrorAlert("Maksimal kapasitas harus berupa angka lebih dari 0.");
-      setLoading(false);
-      return;
-    }
-
-    if (!isActive && !inactiveDescription.trim()) {
-      setShowCreateErrorAlert("Deskripsi tidak aktif wajib diisi jika tempat parkir tidak aktif.");
-      setLoading(false);
-      return;
-    }
-
-    // Validasi jadwal dan petugas
-    for (const day of daysOfWeek) {
-      const schedule = schedules[day];
-
-      // Jika tidak diisi sama sekali, jadikan tutup
-      if (!schedule) {
-        schedules[day] = {
-          id: day,
-          day_of_week: day,
-          is_closed: true,
-          open_time: "",
-          closed_time: "",
-          created_at: serverTimestamp() as unknown as FirestoreTimestamp,
-          updated_at: serverTimestamp() as unknown as FirestoreTimestamp,
-          deleted_at: null,
-        };
-        continue;
-      }
-
-      if (!schedule.is_closed) {
-        if (!schedule.open_time || !schedule.closed_time) {
-          setShowCreateErrorAlert(`Jam buka dan tutup hari ${dayLabels[day]} wajib diisi jika tidak tutup.`);
-          setLoading(false);
-          return;
-        }
-
-        if (!assignments[day]) {
-          setShowCreateErrorAlert(`Penjaga parkir untuk hari ${dayLabels[day]} belum dipilih.`);
-          setLoading(false);
-          return;
-        }
-      }
-    }
-
-    setLoading(true);
-    try {
-      const now = new Date();
-
-      const parkingLotId = uuidv4();
-      console.log("Raw maxCapacity:", maxCapacity);
-      console.log("Parsed maxCapacity:", parseInt(maxCapacity, 10));
-
-      const parkingLotData = {
-        id: parkingLotId,
-        name,
-        max_capacity: parseInt(maxCapacity, 10),
-        latitude: location.lat,
-        longitude: location.lng,
-        is_active: isActive,
-        inactive_description: isActive ? null : inactiveDescription,
-        created_at: now,
-        updated_at: now,
-        deleted_at: null,
-      };
-
-      await setDoc(doc(db, "parking_lots", parkingLotId), parkingLotData);
-
-      for (const day of Object.keys(schedules)) {
-        const schedule = schedules[day]!;
-        const scheduleId = uuidv4();
-        const attendantId = assignments[day];
-
-        await setDoc(doc(db, "parking_schedules", scheduleId), {
-          id: scheduleId,
-          day_of_week: day,
-          open_time: schedule.open_time ? format(schedule.open_time, "HH:mm") : null,
-          closed_time: schedule.closed_time ? format(schedule.closed_time, "HH:mm") : null,
-          is_closed: schedule.is_closed,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-        });
-        if (attendantId) {
-          const parkingAssignmentsId = uuidv4();
-
-          await setDoc(doc(db, "parking_assignments", parkingAssignmentsId), {
-            id: parkingAssignmentsId,
-            parking_lot_id: parkingLotId,
-            parking_schedule_id: scheduleId,
-            parking_attendant_id: attendantId,
-            created_at: now,
-            updated_at: now,
-            deleted_at: null,
-          });
-        }
-      }
-
-      setLoading(false);
-      navigate("/");
-      alert("Tempat parkir berhasil ditambahkan!");
-    } catch (e) {
-      setLoading(false);
-      alert(`Gagal Menambahkan Data ${e}`);
-    }
-  };
-
   const getAvailableAttendantsForDay = (day: string): ParkingAttendant[] => {
     const busyAttendantIds = parkingAssignments.filter((assignment) => assignment.day_of_week === day && assignment.deleted_at == null).map((assignment) => assignment.parking_attendant_id);
 
     return attendants.filter((attendant) => !busyAttendantIds.includes(attendant.id));
   };
+
+  if (loading) return <p>Memuat data...</p>;
+  if (error) return <Alert variant="error" title="Error" message={error} />;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-6 shadow-xl rounded-2xl space-y-8 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -388,9 +405,9 @@ export default function CreateParkingLotForm() {
           <LocationSelector />
         </MapContainer>
       </div>
-      {showCreateErrorAlert && (
+      {showUpdateErrorAlert && (
         <div className="my-5">
-          <Alert variant="error" title="Gagal Menambahkan Tempat Parkir" message={showCreateErrorAlert} />
+          <Alert variant="error" title="Gagal Memperbarui Tempat Parkir" message={showUpdateErrorAlert} />
         </div>
       )}
       <button type="submit" disabled={loading} className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">

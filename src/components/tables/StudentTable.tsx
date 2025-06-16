@@ -6,7 +6,6 @@ import Button from "../ui/button/Button";
 import DeleteButton from "./DeleteButton";
 import { useNavigate } from "react-router";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
-import Input from "../form/input/InputField";
 import SearchInput from "../ui/search";
 
 export interface Student {
@@ -62,10 +61,8 @@ export default function StudentTable() {
 
   const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(search.toLowerCase()));
 
-
   const handleEdit = (studentId: string) => {
-    console.log("Edit student", studentId);
-    // TODO: navigasi atau buka modal edit
+    navigate(`/update-student/${studentId}`);
   };
 
   return (
@@ -107,9 +104,10 @@ export default function StudentTable() {
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">
                     {/* <Button size="sm" variant="primary" onClick={() => navigate("/student-detail", { state: { patient: patient } })}> */}
-                    <Button size="sm" variant="primary" onClick={() => alert(`Edit ${student.name}`)}>
+                    <Button size="sm" variant="primary" onClick={() => handleEdit(student.id)}>
                       Edit
                     </Button>
+
                     <DeleteButton data={student} collectionName="students" />
                   </div>
                 </TableCell>

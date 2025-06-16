@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
-import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import SearchInput from "../ui/search";
 import DeleteButton from "./DeleteButton";
+import { useNavigate } from "react-router";
 
 type ParkingLot = {
   id: string;
@@ -33,6 +33,7 @@ export default function ParkingLotTable() {
   const [filteredLots, setFilteredLots] = useState<LotWithSchedules[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -157,7 +158,7 @@ export default function ParkingLotTable() {
                   </TableCell>
 
                   <TableCell className="space-x-2 py-4 text-gray-800 text-theme-sm dark:text-white/90">
-                    <Button size="sm" variant="primary">
+                    <Button size="sm" variant="primary" onClick={() => navigate(`/update-parking-lot/${lot.id}`)}>
                       Edit
                     </Button>
                     <DeleteButton data={lot} collectionName="parking_lots" />
