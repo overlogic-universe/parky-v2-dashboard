@@ -16,7 +16,6 @@ import ParkingSchedulePage from "./pages/ParkingSchedulePage/ParkingSchedulePage
 import ParkingActivityPage from "./pages/ParkingActivityPage/ParkingActivityPage";
 import ParkingActivityTodayPage from "./pages/ParkingActivityPage/ParkingActivityTodayPage";
 import UpdateParkingLotPage from "./pages/UpdateParkingLotPage/UpdateParkingLotPage";
-import UpdateStudent from "./pages/UpdateStudentPage/UpdateStudentPage";
 import UpdateStudentPage from "./pages/UpdateStudentPage/UpdateStudentPage";
 import UpdateParkingAttendantPage from "./pages/UpdateParkingAttendantPage/UpdateParkingAttendantPage";
 

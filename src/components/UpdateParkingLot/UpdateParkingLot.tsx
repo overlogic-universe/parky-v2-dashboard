@@ -2,7 +2,7 @@
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { useNavigate } from "react-router";
 import DatePicker from "react-datepicker";
-import { toZonedTime, format } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
 import "react-datepicker/dist/react-datepicker.css";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useState, useEffect } from "react";
@@ -31,7 +31,7 @@ export default function UpdateParkingLotForm({ parkingLotId }: UpdateParkingLotF
   const [schedules, setSchedules] = useState<Partial<Record<string, ParkingSchedule>>>({});
   const [attendants, setAttendants] = useState<ParkingAttendant[]>([]);
   const [parkingAssignments, setParkingAssignments] = useState<any[]>([]);
-  const [showUpdateErrorAlert, setShowUpdateErrorAlert] = useState<string | null>(null);
+  const [showUpdateErrorAlert, _] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const jakartaTimezone = "Asia/Jakarta";
@@ -411,7 +411,7 @@ export default function UpdateParkingLotForm({ parkingLotId }: UpdateParkingLotF
         </div>
       )}
       <button type="submit" disabled={loading} className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
-        {loading ? "Mendaftarkan..." : "Daftar"}
+        {loading ? "Memperbarui..." : "Perbarui"}
       </button>
     </form>
   );
