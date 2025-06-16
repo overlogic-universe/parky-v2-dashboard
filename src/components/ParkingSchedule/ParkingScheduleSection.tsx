@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tab";
-import {  ParkingAssignment, ParkingAttendant, ParkingLot, ParkingSchedule } from "../../interface/interface";
+import { ParkingAssignment, ParkingAttendant, ParkingLot, ParkingSchedule } from "../../interface/interface";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import SearchInput from "../ui/search";
 import { DAYS, translateDayToIndo } from "../../utils/DayUtil";
@@ -30,10 +30,10 @@ export default function ParkingScheduleSection() {
         setLoading(true);
 
         const [scheduleSnap, assignmentSnap, lotSnap, attendantSnap] = await Promise.all([
-          getDocs(collection(db, "parking_schedules")),
-          getDocs(collection(db, "parking_assignments")),
-          getDocs(collection(db, "parking_lots")),
-          getDocs(collection(db, "parking_attendants")),
+          getDocs(query(collection(db, "parking_schedules"), where("deleted_at", "==", null))),
+          getDocs(query(collection(db, "parking_assignments"), where("deleted_at", "==", null))),
+          getDocs(query(collection(db, "parking_lots"), where("deleted_at", "==", null))),
+          getDocs(query(collection(db, "parking_attendants"), where("deleted_at", "==", null))),
         ]);
 
         const schedules: ParkingSchedule[] = scheduleSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as ParkingSchedule));
@@ -124,8 +124,8 @@ export default function ParkingScheduleSection() {
                     {filteredData.map((item, index) => (
                       <TableRow key={index} className={`py-5 ${index % 2 !== 1 ? "bg-gray-200 dark:bg-gray-900" : ""} hover:bg-gray-100 dark:hover:bg-gray-800`}>
                         <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.lotName}</TableCell>
-                        <TableCell className="py-4 text-green-500 text-theme-sm">{item.openTime}</TableCell>
-                        <TableCell className="py-4 text-red-400 text-theme-sm">{item.closedTime}</TableCell>
+                        <TableCell className="py-4 text-green-500 text-theme-sm">{item.openTime} WIB</TableCell>
+                        <TableCell className="py-4 text-red-400 text-theme-sm">{item.closedTime} WIB</TableCell>
                         <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{item.attendantName}</TableCell>
                       </TableRow>
                     ))}

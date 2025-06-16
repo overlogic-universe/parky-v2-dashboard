@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../configuration";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import Button from "../ui/button/Button";
@@ -19,13 +19,14 @@ export default function ParkingAttendant() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const userSnapshot = await getDocs(collection(db, "parking_attendants"));
+        const usersQuery = query(collection(db, "parking_attendants"), where("deleted_at", "==", null));
+        const userSnapshot = await getDocs(usersQuery);
+
         console.log(`USER ${userSnapshot}}`);
         const usersData = userSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -45,25 +46,9 @@ export default function ParkingAttendant() {
 
   const filteredUsers = users.filter((user) => user.name.toLowerCase().includes(search.toLowerCase()));
 
-  const handleDetail = (userId: string) => {
-    console.log("Detail user", userId);
-    // TODO: navigasi ke halaman detail user
-    navigate(`/users/${userId}`);
-  };
-
-  const handleAdd = () => {
-    console.log("Add user");
-    // TODO: navigasi atau buka modal tambah
-  };
-
   const handleEdit = (userId: string) => {
     console.log("Edit user", userId);
     // TODO: navigasi atau buka modal edit
-  };
-
-  const handleDelete = (userId: string) => {
-    console.log("Delete user", userId);
-    // TODO: tampilkan konfirmasi & hapus dari Firestore
   };
 
   return (
@@ -96,14 +81,11 @@ export default function ParkingAttendant() {
                 <TableCell className="py-4 text-gray-800 text-theme-sm dark:text-white/90">{user.email}</TableCell>
                 <TableCell className="flex gap-2 py-2">
                   <div className="flex justify-center items-center gap-2">
-                    {/* <Button size="sm" variant="primary" onClick={() => navigate("/user-detail", { state: { patient: patient } })}> */}
-                    <Button size="sm" variant="primary">
-                      Detail
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => alert(`Edit ${user.name}`)}>
+                  
+                    <Button size="sm" variant="primary" onClick={() => alert(`Edit ${user.name}`)}>
                       Edit
                     </Button>
-                    <DeleteButton user={user} />
+                    <DeleteButton data={user} collectionName="parking_attendants" />
                   </div>
                 </TableCell>
               </TableRow>

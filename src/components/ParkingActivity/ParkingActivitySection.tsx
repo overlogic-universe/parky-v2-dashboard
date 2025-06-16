@@ -9,7 +9,7 @@ import { ParkingActivity, ParkingAssignment, ParkingAttendant, ParkingHistory, P
 import SearchInput from "../ui/search";
 import { LoadingAnimation } from "../ui/loading/LoadingAnimation";
 import { DAYS, translateDayToIndo } from "../../utils/DayUtil";
-
+import { formatDateWithTime, formatFullIndoDateTime } from "../../utils/DateUtil";
 
 interface ActivityItem {
   studentName: string;
@@ -93,8 +93,8 @@ export default function ParkingActivitySection() {
                     studentName: student?.name || "-",
                     nim: student?.nim || "-",
                     vehiclePlate: vehicle?.plate || "-",
-                    parkedAt: history?.parked_at ? new Date(history.parked_at.seconds * 1000).toLocaleTimeString() : "-",
-                    exitedAt: history?.exited_at ? new Date(history.exited_at.seconds * 1000).toLocaleTimeString() : "-",
+                    parkedAt: history?.parked_at ? formatFullIndoDateTime(new Date(history.parked_at.seconds * 1000)) : "-",
+                    exitedAt: history?.exited_at ? formatFullIndoDateTime(new Date(history.exited_at.seconds * 1000)) : "-",
                     status: history?.status || "-",
                     updatedAt: history?.updated_at ? new Date(history.updated_at.seconds * 1000) : null,
                     attendantName: attendant?.name || "-",

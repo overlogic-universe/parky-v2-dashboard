@@ -19,12 +19,21 @@ export const useDashboard = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const studentSnap = await getDocs(query(collection(db, "students")));
+        const studentQuery = query(
+          collection(db, "students"),
+          where("deleted_at", "==", null) 
+        );
+
+        const studentSnap = await getDocs(studentQuery);
         setTotalStudents(studentSnap.size);
 
-        // Fetch total attendants
-        const attendantSnap = await getDocs(query(collection(db, "parking_attendants")));
-        setTotalAttendants(attendantSnap.size);
+         const parkingAttendantQuery = query(
+          collection(db, "parking_attendants"),
+          where("deleted_at", "==", null) 
+        );
+
+        const parkingAttendantSnap = await getDocs(parkingAttendantQuery);
+        setTotalAttendants(parkingAttendantSnap.size);
 
         const q = query(collection(db, "parking_activities"), where("created_at", ">=", startDate.toDate()), where("created_at", "<=", endDate.toDate()));
         const snap = await getDocs(q);

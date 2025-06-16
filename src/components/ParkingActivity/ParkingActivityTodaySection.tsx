@@ -11,6 +11,7 @@ import SearchInput from "../ui/search";
 import InformationBox from "./InformationBox";
 import { BoxCubeIcon, UserIcon } from "../../icons";
 import { TodayDate } from "../ui/text/TodayDate";
+import { formatTimeWithSecondsWIB } from "../../utils/DateUtil";
 
 interface ActivityItem {
   studentName: string;
@@ -109,8 +110,8 @@ export default function ParkingActivityTodaySection() {
             const student = students.find((s) => s.id === activity.student_id);
             const vehicle = vehicles.find((v) => v.student_id === activity.student_id);
 
-            const parkedAt = history?.parked_at ? new Date(history.parked_at.seconds * 1000).toLocaleTimeString() : "-";
-            const exitedAt = history?.exited_at ? new Date(history.exited_at.seconds * 1000).toLocaleTimeString() : "-";
+            const parkedAt = history?.parked_at ? formatTimeWithSecondsWIB(new Date(history.parked_at.seconds * 1000)) : "-";
+            const exitedAt = history?.exited_at ? formatTimeWithSecondsWIB(new Date(history.exited_at.seconds * 1000)) : "-";
             const status = history?.status || "-";
 
             return {
@@ -146,7 +147,7 @@ export default function ParkingActivityTodaySection() {
 
   return (
     <div className="w-full">
-      <TodayDate/>
+      <TodayDate />
       {loading ? (
         <LoadingAnimation />
       ) : (

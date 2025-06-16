@@ -33,6 +33,7 @@ export interface ParkingAttendant {
   email: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Parking Lots ==========
@@ -46,6 +47,7 @@ export interface ParkingLot {
   inactive_description: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Parking Assignments ==========
@@ -56,17 +58,19 @@ export interface ParkingAssignment {
   parking_attendant_id: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Parking Schedules ==========
 export interface ParkingSchedule {
   id: string;
-  day_of_week: string; 
+  day_of_week: string;
   open_time: string;
   closed_time: string;
   is_closed: boolean;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Students ==========
@@ -79,6 +83,7 @@ export interface Student {
   password: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Vehicles ==========
@@ -88,6 +93,7 @@ export interface Vehicle {
   plate: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }
 
 // ========== Admins ==========
@@ -97,4 +103,5 @@ export interface Admin {
   email: string;
   created_at: FirestoreTimestamp;
   updated_at: FirestoreTimestamp;
+  deleted_at: FirestoreTimestamp | null;
 }

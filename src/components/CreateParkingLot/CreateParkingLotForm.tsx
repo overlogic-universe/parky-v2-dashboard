@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 import DatePicker from "react-datepicker";
 import { db } from "../../configuration";
-import { doc, setDoc, collection, getDocs, serverTimestamp, getDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, serverTimestamp, getDoc, query, where } from "firebase/firestore";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import "leaflet/dist/leaflet.css";
@@ -49,17 +49,21 @@ export default function CreateParkingLotForm() {
           return {
             ...data,
             day_of_week: scheduleData?.day_of_week || null,
+            deleted_at: data.deleted_at || null, // <- tambahkan ini agar bisa difilter nanti
           };
         })
       );
       setParkingAssignments(assignmentsData);
     };
+
     fetchParkingAssignments();
   }, []);
 
   useEffect(() => {
     const fetchAttendants = async () => {
-      const snapshot = await getDocs(collection(db, "parking_attendants"));
+      const attendantsQuery = query(collection(db, "parking_attendants"), where("deleted_at", "==", null));
+
+      const snapshot = await getDocs(attendantsQuery);
       const data: ParkingAttendant[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -116,16 +120,33 @@ export default function CreateParkingLotForm() {
     for (const day of daysOfWeek) {
       const schedule = schedules[day];
 
-      if (!schedule || (!schedule.is_closed && (!schedule.open_time || !schedule.closed_time))) {
-        setShowLoginErrorAlert(`Jadwal hari ${dayLabels[day]} belum lengkap. Pastikan jam buka dan tutup diisi jika tidak ditutup.`);
-        setLoading(false);
-        return;
+      // Jika tidak diisi sama sekali, jadikan tutup
+      if (!schedule) {
+        schedules[day] = {
+          id: day,
+          day_of_week: day,
+          is_closed: true,
+          open_time: "",
+          closed_time: "",
+          created_at: serverTimestamp() as unknown as FirestoreTimestamp,
+          updated_at: serverTimestamp() as unknown as FirestoreTimestamp,
+          deleted_at: null,
+        };
+        continue;
       }
 
-      if (!assignments[day]) {
-        setShowLoginErrorAlert(`Penjaga parkir untuk hari ${dayLabels[day]} belum dipilih.`);
-        setLoading(false);
-        return;
+      if (!schedule.is_closed) {
+        if (!schedule.open_time || !schedule.closed_time) {
+          setShowLoginErrorAlert(`Jam buka dan tutup hari ${dayLabels[day]} wajib diisi jika tidak tutup.`);
+          setLoading(false);
+          return;
+        }
+
+        if (!assignments[day]) {
+          setShowLoginErrorAlert(`Penjaga parkir untuk hari ${dayLabels[day]} belum dipilih.`);
+          setLoading(false);
+          return;
+        }
       }
     }
 
@@ -147,6 +168,7 @@ export default function CreateParkingLotForm() {
         inactive_description: isActive ? null : inactiveDescription,
         created_at: now,
         updated_at: now,
+        deleted_at: null,
       };
 
       await setDoc(doc(db, "parking_lots", parkingLotId), parkingLotData);
@@ -164,6 +186,7 @@ export default function CreateParkingLotForm() {
           is_closed: schedule.is_closed,
           created_at: now,
           updated_at: now,
+          deleted_at: null,
         });
         if (attendantId) {
           const parkingAssignmentsId = uuidv4();
@@ -175,6 +198,7 @@ export default function CreateParkingLotForm() {
             parking_attendant_id: attendantId,
             created_at: now,
             updated_at: now,
+            deleted_at: null,
           });
         }
       }
@@ -189,7 +213,7 @@ export default function CreateParkingLotForm() {
   };
 
   const getAvailableAttendantsForDay = (day: string): ParkingAttendant[] => {
-    const busyAttendantIds = parkingAssignments.filter((assignment) => assignment.day_of_week === day).map((assignment) => assignment.parking_attendant_id);
+    const busyAttendantIds = parkingAssignments.filter((assignment) => assignment.day_of_week === day && assignment.deleted_at == null).map((assignment) => assignment.parking_attendant_id);
 
     return attendants.filter((attendant) => !busyAttendantIds.includes(attendant.id));
   };
@@ -234,6 +258,7 @@ export default function CreateParkingLotForm() {
                         closed_time: "",
                         created_at: serverTimestamp() as unknown as FirestoreTimestamp,
                         updated_at: serverTimestamp() as unknown as FirestoreTimestamp,
+                        deleted_at: null,
                       };
 
                       return {
@@ -270,6 +295,7 @@ export default function CreateParkingLotForm() {
                         closed_time: "",
                         created_at: serverTimestamp() as unknown as FirestoreTimestamp,
                         updated_at: serverTimestamp() as unknown as FirestoreTimestamp,
+                        deleted_at: null,
                       };
 
                       return {
@@ -293,9 +319,9 @@ export default function CreateParkingLotForm() {
                   className="w-full rounded-lg dark:text-white px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500 border border-gray-300 bg-white dark:border-white/[0.05] dark:bg-white/[0.05]"
                 />
 
-                {/* Toggle Buka */}
+                {/* Toggle Tutup */}
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-800 dark:text-gray-400">Buka</span>
+                  <span className="text-sm text-gray-800 dark:text-gray-400">Tutup</span>
                   <Label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -305,11 +331,12 @@ export default function CreateParkingLotForm() {
                           const current: ParkingSchedule = prev[day] ?? {
                             id: day,
                             day_of_week: day,
-                            is_closed: true,
+                            is_closed: false,
                             open_time: "",
                             closed_time: "",
                             created_at: serverTimestamp() as unknown as FirestoreTimestamp,
                             updated_at: serverTimestamp() as unknown as FirestoreTimestamp,
+                            deleted_at: null,
                           };
 
                           return { ...prev, [day]: { ...current, is_closed: e.target.checked } };
@@ -317,7 +344,7 @@ export default function CreateParkingLotForm() {
                       }
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-400 transition-all duration-300"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-red-400 transition-all duration-300"></div>
                     <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-full transition-transform duration-300"></div>
                   </Label>
                 </div>

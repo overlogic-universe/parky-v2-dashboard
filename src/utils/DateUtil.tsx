@@ -42,3 +42,33 @@ export const formatDateWithTime = (dateString: string) => {
 
   return `${formattedDate}, ${formattedTime} WIB`;
 };
+
+export function formatTimeWithSecondsWIB(date: Date): string {
+  return date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }) + " WIB";
+}
+
+
+
+export function formatFullIndoDateTime(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  };
+
+  const datePart = new Intl.DateTimeFormat("id-ID", options).format(date);
+  const timePart = date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  return `${datePart} ${timePart} WIB`;
+}

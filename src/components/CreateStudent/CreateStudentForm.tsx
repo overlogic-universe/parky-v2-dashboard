@@ -3,9 +3,9 @@ import { useNavigate } from "react-router";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Alert from "../ui/alert/Alert";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { auth, db } from "../../configuration";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid"; // Tambahkan jika pakai UUID
 import { generateRandomPassword } from "../../utils/GetRandomPassword";
 import GeneratedPasswordInformation from "../common/GeneratedPasswordInformation";
@@ -49,7 +49,67 @@ export default function CreateParkingStudentForm() {
     try {
       setLoading(true);
 
-      // 🔐 Auto generate password
+      const studentsQuery = query(collection(db, "students"), where("email", "==", email));
+      const existingStudentSnapshot = await getDocs(studentsQuery);
+
+      if (!existingStudentSnapshot.empty) {
+        // Mahasiswa sudah ada
+        const studentDoc = existingStudentSnapshot.docs[0];
+        const studentData = studentDoc.data();
+        const studentId = studentData.id;
+
+        // Aktifkan kembali & update
+        await updateDoc(doc(db, "students", studentId), {
+          deleted_at: null,
+          updated_at: new Date(),
+          name,
+          nim,
+        });
+
+        // Cek kendaraan
+        const vehiclesQuery = query(collection(db, "vehicles"), where("student_id", "==", studentId));
+        const vehiclesSnapshot = await getDocs(vehiclesQuery);
+
+        if (!vehiclesSnapshot.empty) {
+          const vehicleDoc = vehiclesSnapshot.docs[0];
+          await updateDoc(doc(db, "vehicles", vehicleDoc.id), {
+            deleted_at: null,
+            updated_at: new Date(),
+            plate,
+          });
+        } else {
+          const vehicleId = uuidv4();
+          await setDoc(doc(db, "vehicles", vehicleId), {
+            id: vehicleId,
+            student_id: studentId,
+            plate,
+            created_at: new Date(),
+            updated_at: new Date(),
+            deleted_at: null,
+          });
+        }
+
+        const response = await fetch("http://localhost:5000/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            password: "Untuk mendapatkan password, silakan hubungi admin di adminparky@gmail.com",
+            role: "mahasiswa",
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error("Gagal mengirim email notifikasi: " + errorText);
+        }
+
+        navigate("/");
+        return;
+      }
+
+      // 🔐 Auto generate password & kirim email
       const generatedPassword = generateRandomPassword();
 
       const response = await fetch("http://localhost:5000/send-email", {
@@ -65,15 +125,15 @@ export default function CreateParkingStudentForm() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Gagal mengirim email:", errorText);
-        throw new Error("Gagal mengirim email notifikasi");
+        throw new Error("Gagal mengirim email notifikasi: " + errorText);
       }
 
+      // Buat akun Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, generatedPassword);
       const user = userCredential.user;
-
       const studentId = user.uid;
 
+      // Buat data mahasiswa
       await setDoc(doc(db, "students", studentId), {
         id: studentId,
         qr_code_id: uuidv4(),
@@ -82,9 +142,10 @@ export default function CreateParkingStudentForm() {
         email,
         created_at: new Date(),
         updated_at: new Date(),
+        deleted_at: null,
       });
 
-      // Simpan data kendaraan
+      // Buat data kendaraan
       const vehicleId = uuidv4();
       await setDoc(doc(db, "vehicles", vehicleId), {
         id: vehicleId,
@@ -92,11 +153,13 @@ export default function CreateParkingStudentForm() {
         plate,
         created_at: new Date(),
         updated_at: new Date(),
+        deleted_at: null,
       });
 
       navigate("/");
     } catch (error: any) {
-      setShowLoginErrorAlert("Gagal membuat akun");
+      console.error(error);
+      setShowLoginErrorAlert("Gagal membuat atau memperbarui akun");
     } finally {
       setLoading(false);
     }
